@@ -1,0 +1,31 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  pool: one
+  fighter1: one
+  fighter2: one
+  winner: one
+  status: MyString
+  fighter1_main: MyString
+  fighter1_offhand: MyString
+  fighter1_debuff: MyString
+  fighter2_main: MyString
+  fighter2_offhand: MyString
+  fighter2_debuff: MyString
+  fighter1_points: 1
+  fighter2_points: 1
+
+two:
+  pool: two
+  fighter1: two
+  fighter2: two
+  winner: two
+  status: MyString
+  fighter1_main: MyString
+  fighter1_offhand: MyString
+  fighter1_debuff: MyString
+  fighter2_main: MyString
+  fighter2_offhand: MyString
+  fighter2_debuff: MyString
+  fighter1_points: 1
+  fighter2_points: 1
