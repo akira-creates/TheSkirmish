@@ -2,9 +2,11 @@ Rails.application.routes.draw do
   devise_for :users
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
   authenticate :user do
-    root 'dashboard#index'
+    root 'dashboard#index', as: :authenticated_root
 
-  resources :fighters
+    resources :fighters
+    resources :weapons
+
     resources :pools do
       member do
         post :generate_matches
@@ -30,7 +32,7 @@ Rails.application.routes.draw do
   end
 
   unauthenticated do
-    root 'devise/sessions#new'
+    root 'devise/sessions#new', as: :unauthenticated_root
   end
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

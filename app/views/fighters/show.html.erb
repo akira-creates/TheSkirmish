@@ -1,0 +1,87 @@
+<div class="px-4 sm:px-0">
+  <div class="mb-6">
+    <%= link_to fighters_path, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+      ← Back to Fighters
+    <% end %>
+  </div>
+
+  <div class="bg-white shadow overflow-hidden rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-2xl font-bold text-gray-900"><%= @fighter.name %></h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500"><%= @fighter.club %></p>
+    </div>
+    <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+      <dl class="sm:divide-y sm:divide-gray-200">
+        <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Record</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <span class="text-2xl font-bold"><%= @fighter.wins %>-<%= @fighter.losses %></span>
+          </dd>
+        </div>
+        <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Total Points</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <span class="text-2xl font-bold"><%= @fighter.points %></span>
+          </dd>
+        </div>
+        <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Status</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <% if @fighter.eliminated %>
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Eliminated</span>
+            <% else %>
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+            <% end %>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Match History -->
+  <div class="mt-8">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Match History</h3>
+    <% if @matches.any? %>
+      <div class="bg-white shadow overflow-hidden rounded-lg">
+        <ul class="divide-y divide-gray-200">
+          <% @matches.order(created_at: :desc).each do |match| %>
+            <li class="px-6 py-4">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center text-sm">
+                    <span class="<%= match.fighter1_id == @fighter.id ? 'font-bold' : '' %>">
+                      <%= match.fighter1.name %>
+                    </span>
+                    <span class="mx-2 text-gray-400">vs</span>
+                    <span class="<%= match.fighter2_id == @fighter.id ? 'font-bold' : '' %>">
+                      <%= match.fighter2.name %>
+                    </span>
+                  </div>
+                  <% if match.status == 'completed' %>
+                    <div class="mt-1 text-sm text-gray-500">
+                      Score: <%= match.fighter1_points %> - <%= match.fighter2_points %>
+                      <% if match.winner %>
+                        | Winner: <%= match.winner.name %>
+                      <% end %>
+                    </div>
+                  <% else %>
+                    <div class="mt-1 text-sm text-yellow-600">Pending</div>
+                  <% end %>
+                </div>
+                <% if match.status == 'completed' && match.winner_id == @fighter.id %>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Won</span>
+                <% elsif match.status == 'completed' %>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Lost</span>
+                <% end %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% else %>
+      <div class="bg-white shadow rounded-lg p-6 text-center text-gray-500">
+        No matches yet
+      </div>
+    <% end %>
+  </div>
+</div>

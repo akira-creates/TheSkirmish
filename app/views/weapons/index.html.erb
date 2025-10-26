@@ -1,0 +1,66 @@
+<div class="px-4 sm:px-0">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h2 class="text-3xl font-bold text-gray-900">Weapons</h2>
+      <p class="mt-2 text-sm text-gray-700">Manage available weapons for the tournament.</p>
+    </div>
+  </div>
+
+  <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <!-- Add Weapon Form -->
+    <div class="lg:col-span-1">
+      <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Add New Weapon</h3>
+        <%= simple_form_for @weapon do |f| %>
+          <%= f.input :name, 
+              input_html: { class: "mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" },
+              wrapper_html: { class: "mb-4" } %>
+          
+          <%= f.input :weapon_type, 
+              collection: Weapon::WEAPON_TYPES,
+              input_html: { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" },
+              wrapper_html: { class: "mb-4" } %>
+          
+          <%= f.submit "Add Weapon", class: "w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Weapons List -->
+    <div class="lg:col-span-2">
+      <% if @weapons.any? %>
+        <% Weapon::WEAPON_TYPES.each do |weapon_type| %>
+          <% type_weapons = @weapons.select { |w| w.weapon_type == weapon_type } %>
+          <% if type_weapons.any? %>
+            <div class="mb-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-3"><%= weapon_type %> Weapons (<%= type_weapons.count %>)</h3>
+              <div class="bg-white shadow overflow-hidden rounded-lg">
+                <ul class="divide-y divide-gray-200">
+                  <% type_weapons.each do |weapon| %>
+                    <li class="px-6 py-4 flex items-center justify-between">
+                      <div class="flex-1">
+                        <div class="text-sm font-medium text-gray-900"><%= weapon.name %></div>
+                      </div>
+                      <div class="flex items-center space-x-3">
+                        <%= link_to "Edit", edit_weapon_path(weapon), class: "text-indigo-600 hover:text-indigo-900 text-sm" %>
+                        <%= button_to "Delete", weapon_path(weapon), method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-900 text-sm" %>
+                      </div>
+                    </li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      <% else %>
+        <div class="bg-white shadow rounded-lg p-6 text-center">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No weapons added</h3>
+          <p class="mt-1 text-sm text-gray-500">Add weapons using the form on the left.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
