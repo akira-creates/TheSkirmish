@@ -4,17 +4,29 @@ class Match < ApplicationRecord
   belongs_to :fighter2
   belongs_to :winner
 
+  belongs_to :fighter1_main, class_name: 'Weapon', optional: true
+  belongs_to :fighter1_offhand, class_name: 'Weapon', optional: true
+  belongs_to :fighter2_main, class_name: 'Weapon', optional: true
+  belongs_to :fighter2_offhand, class_name: 'Weapon', optional: true
+
   validates :status, presence: true
 
-  WEAPONS = [ 'Longsword', 'Sword & Buckler', 'Rapier', 'Saber', 'Spear', 'Messer', 'Dagger' ]
   DEBUFFS = [ 'None', 'Blindfold', 'One Hand', 'Backwards', 'Kneeling' ]
+  MAX_POINTS = 12
+  MAX_DURATION = 180
 
-  def complete_match(winner_id, f1_points, f2_points)
+  def complete_match(winner_id, f1_points, f2_points, match_duration)
     update(
       winner_id: winner_id,
       fighter1_points: f1_points,
       fighter2_points: f2_points,
+      duration: match_duration,
       status: 'completed'
     )
+  end
+
+  def weapons_selected?
+    fighter1_main.present? && fighter1_offhand.present? &&
+      fighter2_main.present? && fighter2_offhand.present?
   end
 end

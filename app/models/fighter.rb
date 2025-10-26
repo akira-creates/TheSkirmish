@@ -17,6 +17,13 @@ class Fighter < ApplicationRecord
     Match.where('fighter1_id = ? OR fighter2_id = ?', id, id)
   end
 
+  def pool_record
+    pool_matches = all_matches.where.not(pool_id: nil).where(status: 'completed')
+    wins = pool_matches.where(winner_id: id).count
+    losses = pool_matches.count - wins
+    "#{wins}-#{losses}"
+  end
+
   private
 
   def initialize_stats

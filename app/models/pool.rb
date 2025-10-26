@@ -14,7 +14,9 @@ class Pool < ApplicationRecord
       matches.create!(
         fighter1: f1,
         fighter2: f2,
-        status: 'pending'
+        status: 'pending',
+        fightrt1_points: 0,
+        fighter2_points: 0
       )
     end
   end
@@ -24,11 +26,16 @@ class Pool < ApplicationRecord
     calculate_standings
   end
 
+  def all_matches_completed?
+    matches.where(status: 'pending').empty?
+  end
+
   private
 
   def set_defaults
     self.status ||= 'active'
     self.completed ||= false
+    self.pool_size ||= 5
   end
 
   def calculate_standings

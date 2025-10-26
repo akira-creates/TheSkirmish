@@ -17,5 +17,10 @@ class CreateMatches < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+    # Add these after the table creation
+    add_foreign_key :matches, :weapons, column: :fighter1_main_id
+    add_foreign_key :matches, :weapons, column: :fighter1_offhand_id
+    add_foreign_key :matches, :weapons, column: :fighter2_main_id
+    add_foreign_key :matches, :weapons, column: :fighter2_offhand_id
   end
 end
