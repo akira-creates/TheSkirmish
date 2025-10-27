@@ -1,0 +1,200 @@
+<div class="px-4 sm:px-0 max-w-6xl mx-auto">
+  <div class="mb-6">
+    <%= link_to matches_path, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+      ← Back to Matches
+    <% end %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg p-8">
+    <h2 class="text-3xl font-bold text-gray-900 text-center mb-8">Score Match</h2>
+
+    <!-- Match Info -->
+    <div class="mb-8 p-6 bg-gray-50 rounded-lg">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+        <div>
+          <h3 class="text-xl font-bold text-indigo-700"><%= @match.fighter1.name %></h3>
+          <p class="text-sm text-gray-600"><%= @match.fighter1.club %></p>
+          <div class="mt-2 text-sm">
+            <p><strong>Main:</strong> <%= @match.fighter1_main&.name || 'N/A' %></p>
+            <% if @match.fighter1_offhand %>
+              <p><strong>Off-hand:</strong> <%= @match.fighter1_offhand.name %></p>
+            <% end %>
+            <p><strong>Debuff:</strong> <%= @match.fighter1_debuff || 'None' %></p>
+          </div>
+        </div>
+        
+        <div class="flex items-center justify-center">
+          <span class="text-2xl font-bold text-gray-400">VS</span>
+        </div>
+        
+        <div>
+          <h3 class="text-xl font-bold text-purple-700"><%= @match.fighter2.name %></h3>
+          <p class="text-sm text-gray-600"><%= @match.fighter2.club %></p>
+          <div class="mt-2 text-sm">
+            <p><strong>Main:</strong> <%= @match.fighter2_main&.name || 'N/A' %></p>
+            <% if @match.fighter2_offhand %>
+              <p><strong>Off-hand:</strong> <%= @match.fighter2_offhand.name %></p>
+            <% end %>
+            <p><strong>Debuff:</strong> <%= @match.fighter2_debuff || 'None' %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scoring Interface -->
+    <div class="mb-8">
+      <div class="text-center mb-6">
+        <p class="text-sm text-gray-600 mb-2">First to 12 points OR most points at 3:00</p>
+        <div id="timer" class="text-5xl font-bold text-gray-900 mb-4">3:00</div>
+        <div class="space-x-4">
+          <button id="startTimer" class="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium">Start</button>
+          <button id="pauseTimer" class="px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 font-medium" disabled>Pause</button>
+          <button id="resetTimer" class="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium">Reset</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Fighter 1 Score -->
+        <div class="border-4 border-indigo-300 rounded-lg p-8 bg-indigo-50">
+          <h3 class="text-2xl font-bold text-gray-900 text-center mb-4"><%= @match.fighter1.name %></h3>
+          <div class="text-center mb-6">
+            <div id="fighter1-score" class="text-7xl font-bold text-indigo-600">0</div>
+            <p class="text-sm text-gray-600 mt-2">Points</p>
+          </div>
+          <div class="flex justify-center space-x-4">
+            <button onclick="addPoint('fighter1')" class="px-8 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-xl font-bold">+1</button>
+            <button onclick="subtractPoint('fighter1')" class="px-8 py-4 bg-gray-400 text-white rounded-lg hover:bg-gray-500 text-xl font-bold">-1</button>
+          </div>
+        </div>
+
+        <!-- Fighter 2 Score -->
+        <div class="border-4 border-purple-300 rounded-lg p-8 bg-purple-50">
+          <h3 class="text-2xl font-bold text-gray-900 text-center mb-4"><%= @match.fighter2.name %></h3>
+          <div class="text-center mb-6">
+            <div id="fighter2-score" class="text-7xl font-bold text-purple-600">0</div>
+            <p class="text-sm text-gray-600 mt-2">Points</p>
+          </div>
+          <div class="flex justify-center space-x-4">
+            <button onclick="addPoint('fighter2')" class="px-8 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-xl font-bold">+1</button>
+            <button onclick="subtractPoint('fighter2')" class="px-8 py-4 bg-gray-400 text-white rounded-lg hover:bg-gray-500 text-xl font-bold">-1</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Form -->
+    <%= form_with url: record_result_match_path(@match), method: :patch, id: "match-form" do |f| %>
+      <%= hidden_field_tag :fighter1_points, 0, id: "fighter1_points_input" %>
+      <%= hidden_field_tag :fighter2_points, 0, id: "fighter2_points_input" %>
+      <%= hidden_field_tag :duration, 0, id: "duration_input" %>
+      <%= hidden_field_tag :winner_id, nil, id: "winner_id_input" %>
+      
+      <div class="text-center">
+        <button type="button" onclick="submitMatch('<%= @match.fighter1_id %>')" 
+                class="mx-2 px-8 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-lg font-bold">
+          <%= @match.fighter1.name %> Wins
+        </button>
+        <button type="button" onclick="submitMatch('<%= @match.fighter2_id %>')" 
+                class="mx-2 px-8 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-lg font-bold">
+          <%= @match.fighter2.name %> Wins
+        </button>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  let fighter1Score = 0;
+  let fighter2Score = 0;
+  let timeRemaining = 180; // 3 minutes in seconds
+  let timerInterval = null;
+  let timerRunning = false;
+
+  function updateScoreDisplay() {
+    document.getElementById('fighter1-score').textContent = fighter1Score;
+    document.getElementById('fighter2-score').textContent = fighter2Score;
+    document.getElementById('fighter1_points_input').value = fighter1Score;
+    document.getElementById('fighter2_points_input').value = fighter2Score;
+  }
+
+  function addPoint(fighter) {
+    if (fighter === 'fighter1') {
+      fighter1Score++;
+      if (fighter1Score >= 12) {
+        alert('<%= @match.fighter1.name %> has reached 12 points!');
+        pauseTimer();
+      }
+    } else {
+      fighter2Score++;
+      if (fighter2Score >= 12) {
+        alert('<%= @match.fighter2.name %> has reached 12 points!');
+        pauseTimer();
+      }
+    }
+    updateScoreDisplay();
+  }
+
+  function subtractPoint(fighter) {
+    if (fighter === 'fighter1' && fighter1Score > 0) {
+      fighter1Score--;
+    } else if (fighter === 'fighter2' && fighter2Score > 0) {
+      fighter2Score--;
+    }
+    updateScoreDisplay();
+  }
+
+  function updateTimerDisplay() {
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    document.getElementById('timer').textContent = 
+      `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  function startTimer() {
+    if (!timerRunning) {
+      timerRunning = true;
+      document.getElementById('startTimer').disabled = true;
+      document.getElementById('pauseTimer').disabled = false;
+      
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        
+        if (timeRemaining <= 0) {
+          pauseTimer();
+          alert('Time is up! Match ended.');
+        }
+      }, 1000);
+    }
+  }
+
+  function pauseTimer() {
+    timerRunning = false;
+    clearInterval(timerInterval);
+    document.getElementById('startTimer').disabled = false;
+    document.getElementById('pauseTimer').disabled = true;
+  }
+
+  function resetTimer() {
+    pauseTimer();
+    timeRemaining = 180;
+    updateTimerDisplay();
+  }
+
+  function submitMatch(winnerId) {
+    if (fighter1Score === 0 && fighter2Score === 0) {
+      if (!confirm('Both fighters have 0 points. Are you sure you want to submit?')) {
+        return;
+      }
+    }
+    
+    const elapsedTime = 180 - timeRemaining;
+    document.getElementById('duration_input').value = elapsedTime;
+    document.getElementById('winner_id_input').value = winnerId;
+    document.getElementById('match-form').submit();
+  }
+
+  document.getElementById('startTimer').addEventListener('click', startTimer);
+  document.getElementById('pauseTimer').addEventListener('click', pauseTimer);
+  document.getElementById('resetTimer').addEventListener('click', resetTimer);
+</script>

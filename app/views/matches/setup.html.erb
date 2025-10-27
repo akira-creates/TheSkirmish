@@ -1,0 +1,79 @@
+<div class="px-4 sm:px-0 max-w-4xl mx-auto">
+  <div class="mb-6">
+    <%= link_to matches_path, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+      ← Back to Matches
+    <% end %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg p-6 mb-8">
+    <h2 class="text-2xl font-bold text-gray-900 text-center mb-2">Weapon Selection</h2>
+    <p class="text-center text-gray-600 mb-8">Select weapons and debuffs for each fighter</p>
+
+    <%= simple_form_for @match, url: match_path(@match), method: :patch do |f| %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Fighter 1 -->
+        <div class="border-2 border-indigo-200 rounded-lg p-6 bg-indigo-50">
+          <h3 class="text-xl font-bold text-gray-900 mb-4"><%= @match.fighter1.name %></h3>
+          <p class="text-sm text-gray-600 mb-6"><%= @match.fighter1.club %></p>
+          
+          <div class="space-y-4">
+            <div>
+              <%= f.label :fighter1_main_id, "Main Weapon", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= f.collection_select :fighter1_main_id, @main_weapons, :id, :name, 
+                  { prompt: "Select main weapon" },
+                  { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+            </div>
+            
+            <div>
+              <%= f.label :fighter1_offhand_id, "Off-hand Weapon (Optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= f.collection_select :fighter1_offhand_id, @off_weapons, :id, :name, 
+                  { include_blank: "None" },
+                  { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+            </div>
+            
+            <div>
+              <%= f.label :fighter1_debuff, "Debuff", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= f.select :fighter1_debuff, Match::DEBUFFS, 
+                  {},
+                  { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fighter 2 -->
+        <div class="border-2 border-purple-200 rounded-lg p-6 bg-purple-50">
+          <h3 class="text-xl font-bold text-gray-900 mb-4"><%= @match.fighter2.name %></h3>
+          <p class="text-sm text-gray-600 mb-6"><%= @match.fighter2.club %></p>
+          
+          <div class="space-y-4">
+            <div>
+              <%= f.label :fighter2_main_id, "Main Weapon", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= f.collection_select :fighter2_main_id, @main_weapons, :id, :name, 
+                  { prompt: "Select main weapon" },
+                  { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+            </div>
+            
+            <div>
+              <%= f.label :fighter2_offhand_id, "Off-hand Weapon (Optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= f.collection_select :fighter2_offhand_id, @off_weapons, :id, :name, 
+                  { include_blank: "None" },
+                  { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+            </div>
+            
+            <div>
+              <%= f.label :fighter2_debuff, "Debuff", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= f.select :fighter2_debuff, Match::DEBUFFS, 
+                  {},
+                  { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 flex justify-end space-x-4">
+        <%= link_to "Cancel", matches_path, class: "inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+        <%= f.submit "Continue to Scoring", class: "inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
+      </div>
+    <% end %>
+  </div>
+</div>

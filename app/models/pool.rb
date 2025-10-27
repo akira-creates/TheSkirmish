@@ -15,7 +15,7 @@ class Pool < ApplicationRecord
         fighter1: f1,
         fighter2: f2,
         status: 'pending',
-        fightrt1_points: 0,
+        fighter1_points: 0,
         fighter2_points: 0
       )
     end

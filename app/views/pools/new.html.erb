@@ -1,0 +1,49 @@
+<div class="px-4 sm:px-0">
+  <div class="md:grid md:grid-cols-3 md:gap-6">
+    <div class="md:col-span-1">
+      <div class="px-4 sm:px-0">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Generate Pools</h3>
+        <p class="mt-1 text-sm text-gray-600">
+          Create pools with automatic club distribution. Fighters from the same club will be spread across different pools.
+        </p>
+        <div class="mt-4 p-4 bg-blue-50 rounded-md">
+          <p class="text-sm text-blue-700">
+            <strong>Current fighters:</strong> <%= Fighter.where(eliminated: false).count %>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="mt-5 md:mt-0 md:col-span-2">
+      <%= form_with url: pools_path, method: :post, local: true, class: "bg-white shadow rounded-lg" do |f| %>
+        <div class="px-4 py-5 sm:p-6">
+          <div class="grid grid-cols-6 gap-6">
+            <div class="col-span-6">
+              <label for="pool_size" class="block text-sm font-medium text-gray-700">Fighters per Pool</label>
+              <%= number_field_tag :pool_size, @pool_size, min: 3, max: 10, class: "mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" %>
+              <p class="mt-2 text-sm text-gray-500">Recommended: 4-6 fighters per pool</p>
+            </div>
+
+            <div class="col-span-6">
+              <div class="bg-gray-50 p-4 rounded-md">
+                <h4 class="text-sm font-medium text-gray-900 mb-2">Preview</h4>
+                <p class="text-sm text-gray-600">
+                  With <strong><%= Fighter.where(eliminated: false).count %></strong> fighters and 
+                  <strong><%= @pool_size %></strong> fighters per pool, you'll create approximately
+                  <strong><%= (Fighter.where(eliminated: false).count.to_f / @pool_size).ceil %></strong> pools.
+                </p>
+                <p class="text-sm text-gray-600 mt-2">
+                  Each pool will have approximately 
+                  <strong><%= (@pool_size * (@pool_size - 1) / 2) %></strong> matches.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-4 py-3 bg-gray-50 text-right sm:px-6 rounded-b-lg">
+          <%= link_to "Cancel", pools_path, class: "inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 mr-3" %>
+          <%= f.submit "Generate Pools", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700", data: { confirm: "This will delete existing pools. Are you sure?" } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

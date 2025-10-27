@@ -4,6 +4,7 @@ class Fighter < ApplicationRecord
 
   has_many :matches_as_fighter1, class_name: 'Match', foreign_key: 'fighter1_id'
   has_many :matches_as_fighter2, class_name: 'Match', foreign_key: 'fighter2_id'
+  has_many :matches_won, class_name: 'Match', foreign_key: 'winner_id'
 
   has_many :brackets_as_fighter1, class_name: 'Bracket', foreign_key: 'fighter1_id'
   has_many :brackets_as_fighter2, class_name: 'Bracket', foreign_key: 'fighter2_id'

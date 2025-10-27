@@ -15,7 +15,7 @@ class PoolGenerator
     # Create empty pools
     pool_count.times do |i|
       pools << Pool.create!(
-        name: "Pool #{('A'.ord + i).chr}", 
+        name: "Pool #{('A'.ord + i).chr}",
         status: 'active',
         pool_size: @pool_size
       )

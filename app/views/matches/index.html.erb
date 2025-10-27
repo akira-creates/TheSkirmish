@@ -1,0 +1,91 @@
+<div class="px-4 sm:px-0">
+  <h2 class="text-3xl font-bold text-gray-900 mb-8">Matches</h2>
+
+  <!-- Pending Matches -->
+  <% if @pending_matches.any? %>
+    <div class="mb-8">
+      <h3 class="text-lg font-medium text-gray-900 mb-4">Pending Matches (<%= @pending_matches.count %>)</h3>
+      <div class="bg-white shadow overflow-hidden rounded-lg">
+        <ul class="divide-y divide-gray-200">
+          <% @pending_matches.each do |match| %>
+            <li class="px-6 py-4 hover:bg-gray-50">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center text-sm">
+                    <span class="font-medium text-gray-900"><%= match.fighter1.name %></span>
+                    <span class="mx-3 text-gray-400">vs</span>
+                    <span class="font-medium text-gray-900"><%= match.fighter2.name %></span>
+                  </div>
+                  <div class="mt-1 text-sm text-gray-500">
+                    <% if match.pool %>
+                      Pool: <%= match.pool.name %>
+                    <% else %>
+                      Bracket Match
+                    <% end %>
+                  </div>
+                </div>
+                <div>
+                  <%= link_to "Setup & Score", setup_match_path(match), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% else %>
+    <div class="mb-8 bg-white shadow rounded-lg p-6 text-center text-gray-500">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No pending matches</h3>
+      <p class="mt-1 text-sm text-gray-500">All matches have been completed or no matches have been generated yet.</p>
+    </div>
+  <% end %>
+
+  <!-- Recent Completed Matches -->
+  <div>
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Recently Completed</h3>
+    <% if @completed_matches.any? %>
+      <div class="bg-white shadow overflow-hidden rounded-lg">
+        <ul class="divide-y divide-gray-200">
+          <% @completed_matches.each do |match| %>
+            <li class="px-6 py-4">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center text-sm">
+                    <span class="<%= match.winner_id == match.fighter1_id ? 'font-bold text-gray-900' : 'text-gray-600' %>">
+                      <%= match.fighter1.name %>
+                    </span>
+                    <span class="mx-3 text-gray-400">vs</span>
+                    <span class="<%= match.winner_id == match.fighter2_id ? 'font-bold text-gray-900' : 'text-gray-600' %>">
+                      <%= match.fighter2.name %>
+                    </span>
+                  </div>
+                  <div class="mt-1 flex items-center text-sm text-gray-500">
+                    <span class="font-semibold text-gray-900 mr-2">
+                      <%= match.fighter1_points %> - <%= match.fighter2_points %>
+                    </span>
+                    <% if match.duration %>
+                      <span>• <%= match.duration %>s</span>
+                    <% end %>
+                    <% if match.pool %>
+                      <span class="ml-2">• <%= match.pool.name %></span>
+                    <% end %>
+                  </div>
+                </div>
+                <div>
+                  <%= link_to "View Details", match_path(match), class: "text-indigo-600 hover:text-indigo-900 text-sm font-medium" %>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% else %>
+      <div class="bg-white shadow rounded-lg p-6 text-center text-gray-500">
+        No completed matches yet
+      </div>
+    <% end %>
+  </div>
+</div>

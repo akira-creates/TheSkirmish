@@ -20,7 +20,7 @@ puts "Admin user created: admin@tournament.local / password"
 # Create weapons
 weapons_data = [
   { name: 'Longsword', weapon_type: 'Two Handed' },
-  { name: 'Sword & Buckler', weapon_type: 'Main Hand' },
+  { name: 'Arming Sword', weapon_type: 'Main Hand' },
   { name: 'Rapier', weapon_type: 'Main Hand' },
   { name: 'Saber', weapon_type: 'Main Hand' },
   { name: 'Spear', weapon_type: 'Two Handed' },

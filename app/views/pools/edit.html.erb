@@ -1,0 +1,71 @@
+<div class="px-4 sm:px-0">
+  <div class="mb-6">
+    <%= link_to @pool, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+      ← Back to Pool
+    <% end %>
+  </div>
+
+  <div class="md:grid md:grid-cols-3 md:gap-6">
+    <div class="md:col-span-1">
+      <div class="px-4 sm:px-0">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Edit Pool</h3>
+        <p class="mt-1 text-sm text-gray-600">
+          Modify pool details and manually adjust fighter assignments. Matches will be regenerated after saving.
+        </p>
+      </div>
+    </div>
+    <div class="mt-5 md:mt-0 md:col-span-2">
+      <%= form_with model: @pool, local: true, class: "bg-white shadow rounded-lg" do |f| %>
+        <div class="px-4 py-5 sm:p-6">
+          <div class="grid grid-cols-6 gap-6">
+            <div class="col-span-6">
+              <%= f.label :name, class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :name, class: "mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" %>
+            </div>
+
+            <div class="col-span-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Current Fighters</label>
+              <div class="space-y-2 mb-4">
+                <% @pool.fighters.each do |fighter| %>
+                  <div class="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                    <div>
+                      <div class="text-sm font-medium text-gray-900"><%= fighter.name %></div>
+                      <div class="text-sm text-gray-500"><%= fighter.club %></div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="col-span-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Add/Replace Fighters</label>
+              <p class="text-sm text-gray-500 mb-3">Select fighters to include in this pool (current selections will be replaced)</p>
+              
+              <% @available_fighters.group_by(&:club).each do |club, club_fighters| %>
+                <div class="mb-4">
+                  <h4 class="text-sm font-semibold text-gray-700 mb-2"><%= club %></h4>
+                  <div class="space-y-2">
+                    <% club_fighters.each do |fighter| %>
+                      <div class="flex items-center">
+                        <input type="checkbox" name="fighter_ids[]" value="<%= fighter.id %>" 
+                               id="fighter_<%= fighter.id %>"
+                               class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                        <label for="fighter_<%= fighter.id %>" class="ml-3 text-sm text-gray-700">
+                          <%= fighter.name %>
+                        </label>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="px-4 py-3 bg-gray-50 text-right sm:px-6 rounded-b-lg">
+          <%= link_to "Cancel", @pool, class: "inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 mr-3" %>
+          <%= f.submit "Update Pool & Regenerate Matches", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

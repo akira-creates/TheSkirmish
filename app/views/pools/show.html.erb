@@ -1,0 +1,171 @@
+<div class="px-4 sm:px-0">
+  <div class="mb-6">
+    <%= link_to pools_path, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+      ← Back to Pools
+    <% end %>
+  </div>
+
+  <div class="bg-white shadow overflow-hidden rounded-lg mb-8">
+    <div class="px-4 py-5 sm:px-6 flex items-center justify-between">
+      <div>
+        <h3 class="text-2xl font-bold text-gray-900"><%= @pool.name %></h3>
+        <p class="mt-1 text-sm text-gray-500">
+          <%= @pool.fighters.count %> fighters • <%= @pool.matches.count %> matches
+        </p>
+      </div>
+      <div>
+        <% if @pool.completed %>
+          <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
+        <% else %>
+          <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Active</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fighters in Pool -->
+  <div class="bg-white shadow rounded-lg p-6 mb-8">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Fighters</h3>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <% @pool.fighters.each do |fighter| %>
+        <div class="border border-gray-200 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-sm font-medium text-gray-900"><%= fighter.name %></h4>
+              <p class="text-sm text-gray-500"><%= fighter.club %></p>
+            </div>
+            <% if @pool.completed %>
+              <div class="text-right">
+                <div class="text-xs text-gray-500">Record</div>
+                <div class="text-sm font-semibold text-gray-900"><%= fighter.pool_record %></div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Matches -->
+  <div class="bg-white shadow rounded-lg p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-medium text-gray-900">Matches</h3>
+      <div class="flex items-center space-x-3">
+        <div class="text-sm text-gray-500">
+          <%= @pool.matches.where(status: 'completed').count %> / <%= @pool.matches.count %> completed
+        </div>
+        <% if @pool.matches.count == 0 && @pool.fighters.count >= 2 %>
+          <%= button_to "Generate Matches", generate_matches_pool_path(@pool), method: :post, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @matches.any? %>
+      <div class="overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fighter 1</th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">vs</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fighter 2</th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th scope="col" class="relative px-6 py-3">
+                <span class="sr-only">Actions</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @matches.each do |match| %>
+              <tr class="<%= 'bg-gray-50' if match.status == 'completed' %>">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="text-sm font-medium text-gray-900">
+                      <%= match.fighter1.name %>
+                    </div>
+                    <% if match.status == 'completed' && match.winner_id == match.fighter1_id %>
+                      <svg class="ml-2 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                      </svg>
+                    <% end %>
+                  </div>
+                  <div class="text-sm text-gray-500"><%= match.fighter1.club %></div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">vs</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="text-sm font-medium text-gray-900">
+                      <%= match.fighter2.name %>
+                    </div>
+                    <% if match.status == 'completed' && match.winner_id == match.fighter2_id %>
+                      <svg class="ml-2 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                      </svg>
+                    <% end %>
+                  </div>
+                  <div class="text-sm text-gray-500"><%= match.fighter2.club %></div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <% if match.status == 'completed' %>
+                    <span class="text-sm font-semibold text-gray-900">
+                      <%= match.fighter1_points %> - <%= match.fighter2_points %>
+                    </span>
+                  <% else %>
+                    <span class="text-sm text-gray-400">-</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <% if match.status == 'completed' %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
+                  <% else %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <% if match.status == 'pending' %>
+                    <%= link_to "Score", setup_match_path(match), class: "text-indigo-600 hover:text-indigo-900" %>
+                  <% else %>
+                    <%= link_to "View", match_path(match), class: "text-gray-600 hover:text-gray-900" %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No matches generated yet</h3>
+        <p class="mt-1 text-sm text-gray-500">
+          <% if @pool.fighters.count >= 2 %>
+            Click "Generate Matches" above to create round-robin matches for this pool.
+          <% else %>
+            Add at least 2 fighters to this pool before generating matches.
+          <% end %>
+        </p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Action Buttons -->
+  <% unless @pool.completed %>
+    <div class="mt-6 flex justify-end space-x-4">
+      <%= link_to "Edit Pool", edit_pool_path(@pool), class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+      
+      <% if @pool.matches.count > 0 %>
+        <%= button_to "Regenerate Matches", generate_matches_pool_path(@pool), method: :post, data: { confirm: "This will delete existing matches and create new ones. Are you sure?" }, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+      <% end %>
+      
+      <% if @pool.all_matches_completed? %>
+        <%= button_to "Complete Pool", complete_pool_path(@pool), method: :post, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700" %>
+      <% else %>
+        <button disabled class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-400 cursor-not-allowed">
+          Complete Pool (All matches must be finished)
+        </button>
+      <% end %>
+    </div>
+  <% end %>
+</div>
