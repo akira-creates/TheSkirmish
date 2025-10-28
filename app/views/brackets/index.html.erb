@@ -1,0 +1,217 @@
+<div class="px-4 sm:px-0">
+  <div class="sm:flex sm:items-center mb-8">
+    <div class="sm:flex-auto">
+      <h2 class="text-3xl font-bold text-gray-900">Elimination Brackets</h2>
+      <p class="mt-2 text-sm text-gray-700">Double elimination tournament brackets.</p>
+    </div>
+    <% if @winners_brackets.empty? %>
+      <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+        <%= link_to "Generate Brackets", new_bracket_path, class: "inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700" %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @winners_brackets.any? || @losers_brackets.any? %>
+    <!-- Winners Bracket -->
+    <div class="mb-8">
+      <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">Winners Bracket</h3>
+        
+        <% @winners_brackets.group_by(&:round).sort.each do |round, brackets| %>
+          <div class="mb-8">
+            <h4 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">
+              Round <%= round %> 
+              <% if round == @winners_brackets.maximum(:round) %>
+                <span class="text-purple-600">(Finals)</span>
+              <% end %>
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <% brackets.sort_by(&:position).each do |bracket| %>
+                <div class="border-2 <%= bracket.completed ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-white' %> rounded-lg p-4">
+                  <div class="text-xs text-gray-500 mb-2">Match <%= bracket.position %></div>
+                  
+                  <!-- Fighter 1 -->
+                  <div class="flex items-center justify-between mb-2 p-2 rounded <%= bracket.completed && bracket.winner_id == bracket.fighter1_id ? 'bg-green-200' : 'bg-gray-100' %>">
+                    <div class="flex-1">
+                      <div class="text-sm font-medium <%= bracket.winner_id == bracket.fighter1_id ? 'text-green-900' : 'text-gray-900' %>">
+                        <%= bracket.fighter1&.name || 'TBD' %>
+                      </div>
+                      <div class="text-xs text-gray-600"><%= bracket.fighter1&.club %></div>
+                    </div>
+                    <% if bracket.completed && bracket.winner_id == bracket.fighter1_id %>
+                      <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                      </svg>
+                    <% end %>
+                  </div>
+                  
+                  <div class="text-center text-xs text-gray-400 my-1">vs</div>
+                  
+                  <!-- Fighter 2 -->
+                  <div class="flex items-center justify-between mb-3 p-2 rounded <%= bracket.completed && bracket.winner_id == bracket.fighter2_id ? 'bg-green-200' : 'bg-gray-100' %>">
+                    <div class="flex-1">
+                      <div class="text-sm font-medium <%= bracket.winner_id == bracket.fighter2_id ? 'text-green-900' : 'text-gray-900' %>">
+                        <%= bracket.fighter2&.name || 'TBD' %>
+                      </div>
+                      <div class="text-xs text-gray-600"><%= bracket.fighter2&.club %></div>
+                    </div>
+                    <% if bracket.completed && bracket.winner_id == bracket.fighter2_id %>
+                      <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                      </svg>
+                    <% end %>
+                  </div>
+                  
+                  <% if bracket.fighter1 && bracket.fighter2 && !bracket.completed %>
+                    <%= link_to "Record Result", edit_bracket_path(bracket), class: "w-full inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
+                  <% elsif bracket.completed %>
+                    <div class="text-center text-xs text-green-600 font-semibold">Completed</div>
+                  <% else %>
+                    <div class="text-center text-xs text-gray-400">Waiting for fighters</div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Losers Bracket -->
+    <% if @losers_brackets.any? %>
+      <div class="mb-8">
+        <div class="bg-white shadow rounded-lg p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-6">Losers Bracket</h3>
+          
+          <% @losers_brackets.group_by(&:round).sort.each do |round, brackets| %>
+            <div class="mb-8">
+              <h4 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">Round <%= round %></h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <% brackets.sort_by(&:position).each do |bracket| %>
+                  <div class="border-2 <%= bracket.completed ? 'border-orange-300 bg-orange-50' : 'border-gray-300 bg-white' %> rounded-lg p-4">
+                    <div class="text-xs text-gray-500 mb-2">Match <%= bracket.position %></div>
+                    
+                    <!-- Fighter 1 -->
+                    <div class="flex items-center justify-between mb-2 p-2 rounded <%= bracket.completed && bracket.winner_id == bracket.fighter1_id ? 'bg-orange-200' : 'bg-gray-100' %>">
+                      <div class="flex-1">
+                        <div class="text-sm font-medium <%= bracket.winner_id == bracket.fighter1_id ? 'text-orange-900' : 'text-gray-900' %>">
+                          <%= bracket.fighter1&.name || 'TBD' %>
+                        </div>
+                        <div class="text-xs text-gray-600"><%= bracket.fighter1&.club %></div>
+                      </div>
+                      <% if bracket.completed && bracket.winner_id == bracket.fighter1_id %>
+                        <svg class="h-5 w-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                      <% end %>
+                    </div>
+                    
+                    <div class="text-center text-xs text-gray-400 my-1">vs</div>
+                    
+                    <!-- Fighter 2 -->
+                    <div class="flex items-center justify-between mb-3 p-2 rounded <%= bracket.completed && bracket.winner_id == bracket.fighter2_id ? 'bg-orange-200' : 'bg-gray-100' %>">
+                      <div class="flex-1">
+                        <div class="text-sm font-medium <%= bracket.winner_id == bracket.fighter2_id ? 'text-orange-900' : 'text-gray-900' %>">
+                          <%= bracket.fighter2&.name || 'TBD' %>
+                        </div>
+                        <div class="text-xs text-gray-600"><%= bracket.fighter2&.club %></div>
+                      </div>
+                      <% if bracket.completed && bracket.winner_id == bracket.fighter2_id %>
+                        <svg class="h-5 w-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                      <% end %>
+                    </div>
+                    
+                    <% if bracket.fighter1 && bracket.fighter2 && !bracket.completed %>
+                      <%= link_to "Record Result", edit_bracket_path(bracket), class: "w-full inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700" %>
+                    <% elsif bracket.completed %>
+                      <div class="text-center text-xs text-orange-600 font-semibold">Completed</div>
+                    <% else %>
+                      <div class="text-center text-xs text-gray-400">Waiting for fighters</div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Grand Finals -->
+    <% if @finals %>
+      <div class="mb-8">
+        <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 shadow-lg rounded-lg p-8 border-2 border-yellow-400">
+          <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">🏆 Grand Finals 🏆</h3>
+          
+          <div class="max-w-2xl mx-auto">
+            <div class="bg-white rounded-lg p-6 shadow-md">
+              <div class="text-xs text-gray-500 mb-4 text-center">Championship Match</div>
+              
+              <!-- Fighter 1 -->
+              <div class="flex items-center justify-between mb-3 p-4 rounded-lg <%= @finals.completed && @finals.winner_id == @finals.fighter1_id ? 'bg-yellow-200 border-2 border-yellow-400' : 'bg-gray-100' %>">
+                <div class="flex-1">
+                  <div class="text-lg font-bold <%= @finals.winner_id == @finals.fighter1_id ? 'text-yellow-900' : 'text-gray-900' %>">
+                    <%= @finals.fighter1&.name || 'Winners Bracket Champion' %>
+                  </div>
+                  <div class="text-sm text-gray-600"><%= @finals.fighter1&.club %></div>
+                </div>
+                <% if @finals.completed && @finals.winner_id == @finals.fighter1_id %>
+                  <div class="text-yellow-600">
+                    <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                <% end %>
+              </div>
+              
+              <div class="text-center text-sm text-gray-400 my-2 font-semibold">VS</div>
+              
+              <!-- Fighter 2 -->
+              <div class="flex items-center justify-between mb-4 p-4 rounded-lg <%= @finals.completed && @finals.winner_id == @finals.fighter2_id ? 'bg-yellow-200 border-2 border-yellow-400' : 'bg-gray-100' %>">
+                <div class="flex-1">
+                  <div class="text-lg font-bold <%= @finals.winner_id == @finals.fighter2_id ? 'text-yellow-900' : 'text-gray-900' %>">
+                    <%= @finals.fighter2&.name || 'Losers Bracket Champion' %>
+                  </div>
+                  <div class="text-sm text-gray-600"><%= @finals.fighter2&.club %></div>
+                </div>
+                <% if @finals.completed && @finals.winner_id == @finals.fighter2_id %>
+                  <div class="text-yellow-600">
+                    <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                <% end %>
+              </div>
+              
+              <% if @finals.fighter1 && @finals.fighter2 && !@finals.completed %>
+                <%= link_to "Record Finals Result", edit_bracket_path(@finals), class: "w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-bold rounded-md text-white bg-yellow-600 hover:bg-yellow-700 shadow-lg" %>
+              <% elsif @finals.completed %>
+                <div class="text-center">
+                  <div class="text-xl font-bold text-yellow-800 mb-2">🎉 Tournament Complete! 🎉</div>
+                  <div class="text-lg text-gray-700">Champion: <span class="font-bold"><%= @finals.winner.name %></span></div>
+                </div>
+              <% else %>
+                <div class="text-center text-sm text-gray-400">Waiting for bracket winners</div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+  <% else %>
+    <!-- Empty State -->
+    <div class="bg-white shadow rounded-lg p-6 text-center">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No brackets created</h3>
+      <p class="mt-1 text-sm text-gray-500">Complete all pools first, then generate elimination brackets.</p>
+      <div class="mt-6">
+        <%= link_to "Generate Brackets", new_bracket_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
+      </div>
+    </div>
+  <% end %>
+</div>
