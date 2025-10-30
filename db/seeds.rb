@@ -8,12 +8,14 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 # Create admin user
-User.create!(
-  email: 'admin@tournament.local',
-  password: 'password',
-  password_confirmation: 'password',
-  admin: true
-)
+if User.count == 0 then
+  User.create!(
+    email: 'admin@tournament.local',
+    password: 'password',
+    password_confirmation: 'password',
+    admin: true
+  )
+end
 
 puts "Admin user created: admin@tournament.local / password"
 
@@ -38,9 +40,10 @@ end
 puts "#{Weapon.count} weapons created"
 
 # Create sample fighters
-clubs = ['Steel City HEMA', 'Iron Gate Fencing', 'Dragon\'s Forge', 'Knight Errant School']
+clubs = [ 'A', 'B', 'C', 'D' ]
 
-20.times do |i|
+puts "How many fighters would you like to create? "
+gets.chomp.to_i.times do |i|
   Fighter.create!(
     name: Faker::Name.name,
     club: clubs.sample
