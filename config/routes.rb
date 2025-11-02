@@ -20,6 +20,8 @@ Rails.application.routes.draw do
         patch :record_result
         get :display
       end
+
+      resources :penalties, only: [ :create, :destroy ]
     end
 
     resources :brackets do

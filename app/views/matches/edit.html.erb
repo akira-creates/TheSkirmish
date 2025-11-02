@@ -10,16 +10,36 @@
 
     <!-- Match Info -->
     <div class="mb-8 p-6 bg-gray-50 rounded-lg">
+      <% if @match.fighter1_starting_points > 0 || @match.fighter2_starting_points > 0 %>
+        <div class="mb-6 p-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg">
+          <div class="text-center">
+            <h4 class="text-sm font-semibold text-yellow-800 mb-2">⚡ STARTING POINT ADVANTAGE ⚡</h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <div class="text-xs text-gray-600"><%= @match.fighter1.name %></div>
+                <div class="text-3xl font-black text-indigo-600"><%= @match.fighter1_starting_points %></div>
+              </div>
+              <div>
+                <div class="text-xs text-gray-600"><%= @match.fighter2.name %></div>
+                <div class="text-3xl font-black text-purple-600"><%= @match.fighter2_starting_points %></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
         <div>
-          <h3 class="text-xl font-bold text-red-700"><%= @match.fighter1.name %></h3>
+          <h3 class="text-xl font-bold text-indigo-700"><%= @match.fighter1.name %></h3>
           <p class="text-sm text-gray-600"><%= @match.fighter1.club %></p>
           <div class="mt-2 text-sm">
-            <p><strong>Main:</strong> <%= @match.fighter1_main&.name || 'N/A' %></p>
+            <p><strong>Main:</strong> <%= @match.fighter1_main&.name || 'N/A' %> <span class="text-indigo-600 font-semibold">(<%= @match.fighter1_main&.cost || 0 %> pts)</span></p>
             <% if @match.fighter1_offhand %>
-              <p><strong>Off-hand:</strong> <%= @match.fighter1_offhand.name %></p>
+              <p><strong>Off-hand:</strong> <%= @match.fighter1_offhand.name %> <span class="text-indigo-600 font-semibold">(<%= @match.fighter1_offhand.cost %> pts)</span></p>
             <% end %>
-            <p><strong>Debuff:</strong> <%= @match.fighter1_debuff || 'None' %></p>
+            <% if @match.fighter1_debuff && @match.fighter1_debuff != 'None' %>
+              <p><strong>Debuff:</strong> <%= @match.fighter1_debuff %> <span class="text-green-600 font-semibold">(+<%= Match::DEBUFFS[@match.fighter1_debuff] %> bonus)</span></p>
+            <% end %>
           </div>
         </div>
         
@@ -28,14 +48,16 @@
         </div>
         
         <div>
-          <h3 class="text-xl font-bold text-sky-700"><%= @match.fighter2.name %></h3>
+          <h3 class="text-xl font-bold text-purple-700"><%= @match.fighter2.name %></h3>
           <p class="text-sm text-gray-600"><%= @match.fighter2.club %></p>
           <div class="mt-2 text-sm">
-            <p><strong>Main:</strong> <%= @match.fighter2_main&.name || 'N/A' %></p>
+            <p><strong>Main:</strong> <%= @match.fighter2_main&.name || 'N/A' %> <span class="text-purple-600 font-semibold">(<%= @match.fighter2_main&.cost || 0 %> pts)</span></p>
             <% if @match.fighter2_offhand %>
-              <p><strong>Off-hand:</strong> <%= @match.fighter2_offhand.name %></p>
+              <p><strong>Off-hand:</strong> <%= @match.fighter2_offhand.name %> <span class="text-purple-600 font-semibold">(<%= @match.fighter2_offhand.cost %> pts)</span></p>
             <% end %>
-            <p><strong>Debuff:</strong> <%= @match.fighter2_debuff || 'None' %></p>
+            <% if @match.fighter2_debuff && @match.fighter2_debuff != 'None' %>
+              <p><strong>Debuff:</strong> <%= @match.fighter2_debuff %> <span class="text-green-600 font-semibold">(+<%= Match::DEBUFFS[@match.fighter2_debuff] %> bonus)</span></p>
+            <% end %>
           </div>
         </div>
       </div>
@@ -46,11 +68,32 @@
       <div class="text-center mb-6">
         <p class="text-sm text-gray-600 mb-2">First to 12 points OR most points at 3:00</p>
         <div id="timer" class="text-5xl font-bold text-gray-900 mb-4">3:00</div>
+        
+        <!-- Timer Controls -->
         <div class="space-x-4 mb-4">
           <button id="startTimer" class="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium">Start</button>
           <button id="pauseTimer" class="px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 font-medium" disabled>Pause</button>
           <button id="resetTimer" class="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium">Reset</button>
         </div>
+        
+        <!-- Manual Time Adjustment -->
+        <div class="inline-block bg-gray-100 rounded-lg p-4 mb-4">
+          <div class="text-xs font-semibold text-gray-700 mb-2">Manual Time Adjustment</div>
+          <div class="flex items-center justify-center space-x-2">
+            <button onclick="adjustTime(-30)" class="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 font-medium text-sm">-30s</button>
+            <button onclick="adjustTime(-10)" class="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 font-medium text-sm">-10s</button>
+            <button onclick="adjustTime(-5)" class="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 font-medium text-sm">-5s</button>
+            <span class="px-3 text-gray-400">|</span>
+            <button onclick="adjustTime(5)" class="px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 font-medium text-sm">+5s</button>
+            <button onclick="adjustTime(10)" class="px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 font-medium text-sm">+10s</button>
+            <button onclick="adjustTime(30)" class="px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 font-medium text-sm">+30s</button>
+          </div>
+          <div class="mt-2">
+            <button onclick="setCustomTime()" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 font-medium text-sm">Set Custom Time</button>
+          </div>
+        </div>
+        
+        <!-- Display Button -->
         <div>
           <button id="openDisplay" class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium">
             📺 Open Audience Display
@@ -66,6 +109,28 @@
             <p class="text-sm text-gray-600 mb-4">Points</p>
             <h3 class="text-xl font-bold text-gray-900"><%= @match.fighter1.name %></h3>
             <p class="text-sm text-gray-600"><%= @match.fighter1.club %></p>
+            
+            <!-- Penalty Summary -->
+            <% penalty_summary = @match.fighter1.penalty_summary %>
+            <% if penalty_summary.values.sum > 0 %>
+              <div class="mt-3 flex items-center justify-center space-x-2 text-xs">
+                <% if penalty_summary[:yellow] > 0 %>
+                  <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full font-semibold">
+                    🟨 <%= penalty_summary[:yellow] %>
+                  </span>
+                <% end %>
+                <% if penalty_summary[:red] > 0 %>
+                  <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full font-semibold">
+                    🟥 <%= penalty_summary[:red] %>
+                  </span>
+                <% end %>
+                <% if penalty_summary[:black] > 0 %>
+                  <span class="px-2 py-1 bg-gray-800 text-white rounded-full font-semibold">
+                    ⬛ <%= penalty_summary[:black] %>
+                  </span>
+                <% end %>
+              </div>
+            <% end %>
           </div>
           <div class="flex justify-center space-x-3">
             <button onclick="addPoint('fighter1')" class="px-8 py-4 bg-red-600 text-white rounded-lg hover:bg-red-700 text-xl font-bold">+1</button>
@@ -80,10 +145,181 @@
             <p class="text-sm text-gray-600 mb-4">Points</p>
             <h3 class="text-xl font-bold text-gray-900"><%= @match.fighter2.name %></h3>
             <p class="text-sm text-gray-600"><%= @match.fighter2.club %></p>
+            
+            <!-- Penalty Summary -->
+            <% penalty_summary = @match.fighter2.penalty_summary %>
+            <% if penalty_summary.values.sum > 0 %>
+              <div class="mt-3 flex items-center justify-center space-x-2 text-xs">
+                <% if penalty_summary[:yellow] > 0 %>
+                  <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full font-semibold">
+                    🟨 <%= penalty_summary[:yellow] %>
+                  </span>
+                <% end %>
+                <% if penalty_summary[:red] > 0 %>
+                  <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full font-semibold">
+                    🟥 <%= penalty_summary[:red] %>
+                  </span>
+                <% end %>
+                <% if penalty_summary[:black] > 0 %>
+                  <span class="px-2 py-1 bg-gray-800 text-white rounded-full font-semibold">
+                    ⬛ <%= penalty_summary[:black] %>
+                  </span>
+                <% end %>
+              </div>
+            <% end %>
           </div>
           <div class="flex justify-center space-x-3">
             <button onclick="addPoint('fighter2')" class="px-8 py-4 bg-sky-600 text-white rounded-lg hover:bg-sky-700 text-xl font-bold">+1</button>
             <button onclick="subtractPoint('fighter2')" class="px-8 py-4 bg-gray-500 text-white rounded-lg hover:bg-gray-600 text-xl font-bold">-1</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Penalty Cards Section -->
+    <div class="mb-8">
+      <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">⚠️ Penalty Cards</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <!-- Fighter 1 Penalties -->
+        <div class="bg-white rounded-lg shadow-lg p-6 border-2 border-red-200">
+          <h4 class="text-lg font-bold text-gray-900 mb-4"><%= @match.fighter1.name %></h4>
+          
+          <!-- Current Match Penalties -->
+          <% current_penalties = @match.fighter1_penalties %>
+          <% if current_penalties.any? %>
+            <div class="mb-4">
+              <div class="text-xs font-semibold text-gray-600 mb-2">THIS MATCH:</div>
+              <% current_penalties.each do |penalty| %>
+                <div class="mb-2 p-3 rounded-lg <%= penalty.card_type == 'yellow' ? 'bg-yellow-50 border border-yellow-300' : penalty.card_type == 'red' ? 'bg-red-50 border border-red-300' : 'bg-gray-800 text-white border border-gray-900' %>">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <div class="text-sm font-bold mb-1">
+                        <%= penalty.card_type == 'yellow' ? '🟨' : penalty.card_type == 'red' ? '🟥' : '⬛' %>
+                        <%= penalty.display_name %>
+                        <% if penalty.point_deduction > 0 %>
+                          <span class="text-xs">(-<%= penalty.point_deduction %> pts)</span>
+                        <% end %>
+                      </div>
+                      <% if penalty.reason.present? %>
+                        <div class="text-xs <%= penalty.card_type == 'black' ? 'text-gray-300' : 'text-gray-600' %>"><%= penalty.reason %></div>
+                      <% end %>
+                    </div>
+                    <%= button_to "×", match_penalty_path(@match, penalty), method: :delete, 
+                        class: "ml-2 text-lg font-bold #{penalty.card_type == 'black' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}", 
+                        data: { confirm: "Remove this penalty?" },
+                        form: { style: "display: inline;" } %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+          
+          <!-- Tournament History -->
+          <% tournament_penalties = @match.fighter1.penalties.where.not(match_id: @match.id).recent.limit(5) %>
+          <% if tournament_penalties.any? %>
+            <div class="mb-4 pt-4 border-t border-gray-200">
+              <div class="text-xs font-semibold text-gray-600 mb-2">TOURNAMENT HISTORY:</div>
+              <% tournament_penalties.each do |penalty| %>
+                <div class="mb-1 p-2 rounded text-xs bg-gray-50 border border-gray-200">
+                  <%= penalty.card_type == 'yellow' ? '🟨' : penalty.card_type == 'red' ? '🟥' : '⬛' %>
+                  <%= penalty.display_name %>
+                  <% if penalty.reason.present? %>
+                    - <%= penalty.reason.truncate(30) %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+          
+          <!-- Issue Penalty Form -->
+          <div class="pt-4 border-t border-gray-200">
+            <div class="text-xs font-semibold text-gray-700 mb-2">ISSUE PENALTY:</div>
+            <%= form_with url: [@match, Penalty.new], method: :post, local: true do |f| %>
+              <%= f.hidden_field :fighter_id, value: @match.fighter1_id %>
+              <div class="space-y-2">
+                <%= f.select :card_type, 
+                    [['yellow', 'Yelllow Card (Warning)'], ['red', 'Red Card (-3 pts)'], ['black', 'Black Card (Expulsion)']], 
+                    { prompt: 'Select card type' },
+                    { class: 'block w-full text-sm border-gray-300 rounded-md mb-2' } %>
+                <%= f.text_area :reason, 
+                    placeholder: 'Reason (optional)', 
+                    rows: 2,
+                    class: 'block w-full text-sm border-gray-300 rounded-md mb-2' %>
+                <%= f.submit 'Issue Penalty', class: 'w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm font-medium' %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Fighter 2 Penalties -->
+        <div class="bg-white rounded-lg shadow-lg p-6 border-2 border-sky-200">
+          <h4 class="text-lg font-bold text-gray-900 mb-4"><%= @match.fighter2.name %></h4>
+          
+          <!-- Current Match Penalties -->
+          <% current_penalties = @match.fighter2_penalties %>
+          <% if current_penalties.any? %>
+            <div class="mb-4">
+              <div class="text-xs font-semibold text-gray-600 mb-2">THIS MATCH:</div>
+              <% current_penalties.each do |penalty| %>
+                <div class="mb-2 p-3 rounded-lg <%= penalty.card_type == 'yellow' ? 'bg-yellow-50 border border-yellow-300' : penalty.card_type == 'red' ? 'bg-red-50 border border-red-300' : 'bg-gray-800 text-white border border-gray-900' %>">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <div class="text-sm font-bold mb-1">
+                        <%= penalty.card_type == 'yellow' ? '🟨' : penalty.card_type == 'red' ? '🟥' : '⬛' %>
+                        <%= penalty.display_name %>
+                        <% if penalty.point_deduction > 0 %>
+                          <span class="text-xs">(-<%= penalty.point_deduction %> pts)</span>
+                        <% end %>
+                      </div>
+                      <% if penalty.reason.present? %>
+                        <div class="text-xs <%= penalty.card_type == 'black' ? 'text-gray-300' : 'text-gray-600' %>"><%= penalty.reason %></div>
+                      <% end %>
+                    </div>
+                    <%= button_to "×", match_penalty_path(@match, penalty), method: :delete, 
+                        class: "ml-2 text-lg font-bold #{penalty.card_type == 'black' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}", 
+                        data: { confirm: "Remove this penalty?" },
+                        form: { style: "display: inline;" } %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+          
+          <!-- Tournament History -->
+          <% tournament_penalties = @match.fighter2.penalties.where.not(match_id: @match.id).recent.limit(5) %>
+          <% if tournament_penalties.any? %>
+            <div class="mb-4 pt-4 border-t border-gray-200">
+              <div class="text-xs font-semibold text-gray-600 mb-2">TOURNAMENT HISTORY:</div>
+              <% tournament_penalties.each do |penalty| %>
+                <div class="mb-1 p-2 rounded text-xs bg-gray-50 border border-gray-200">
+                  <%= penalty.card_type == 'yellow' ? '🟨' : penalty.card_type == 'red' ? '🟥' : '⬛' %>
+                  <%= penalty.display_name %>
+                  <% if penalty.reason.present? %>
+                    - <%= penalty.reason.truncate(30) %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+          
+          <!-- Issue Penalty Form -->
+          <div class="pt-4 border-t border-gray-200">
+            <div class="text-xs font-semibold text-gray-700 mb-2">ISSUE PENALTY:</div>
+            <%= form_with url: match_penalties_path(@match), method: :post, local: true do |f| %>
+              <%= f.hidden_field :fighter_id, value: @match.fighter2_id %>
+              <div class="space-y-2">
+                <%= f.select :card_type, 
+                    [['Yellow Card (Warning)', 'yellow'], ['Red Card (-3 pts)', 'red'], ['Black Card (Expulsion)', 'black']], 
+                    { prompt: 'Select card type' },
+                    { class: 'block w-full text-sm border-gray-300 rounded-md mb-2' } %>
+                <%= f.text_area :reason, 
+                    placeholder: 'Reason (optional)', 
+                    rows: 2,
+                    class: 'block w-full text-sm border-gray-300 rounded-md mb-2' %>
+                <%= f.submit 'Issue Penalty', class: 'w-full px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 text-sm font-medium' %>
+              </div>
+            <% end %>
           </div>
         </div>
       </div>
@@ -98,11 +334,11 @@
       
       <div class="text-center">
         <button type="button" onclick="submitMatch('<%= @match.fighter1_id %>')" 
-                class="mx-2 px-8 py-4 bg-red-600 text-white rounded-lg hover:bg-red-700 text-lg font-bold">
+                class="mx-2 px-8 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-lg font-bold">
           <%= @match.fighter1.name %> Wins
         </button>
         <button type="button" onclick="submitMatch('<%= @match.fighter2_id %>')" 
-                class="mx-2 px-8 py-4 bg-sky-600 text-white rounded-lg hover:bg-sky-700 text-lg font-bold">
+                class="mx-2 px-8 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-lg font-bold">
           <%= @match.fighter2.name %> Wins
         </button>
       </div>
@@ -253,6 +489,37 @@
     pauseTimer();
     timeRemaining = 180;
     updateTimerDisplay();
+  }
+  
+  function adjustTime(seconds) {
+    timeRemaining = Math.max(0, Math.min(600, timeRemaining + seconds)); // Cap between 0 and 10 minutes
+    updateTimerDisplay();
+  }
+  
+  function setCustomTime() {
+    const currentMinutes = Math.floor(timeRemaining / 60);
+    const currentSeconds = timeRemaining % 60;
+    
+    const input = prompt(`Set custom time (format: MM:SS)\nCurrent time: ${currentMinutes}:${currentSeconds.toString().padStart(2, '0')}`, 
+                         `${currentMinutes}:${currentSeconds.toString().padStart(2, '0')}`);
+    
+    if (input) {
+      const parts = input.split(':');
+      if (parts.length === 2) {
+        const minutes = parseInt(parts[0]) || 0;
+        const seconds = parseInt(parts[1]) || 0;
+        const totalSeconds = (minutes * 60) + seconds;
+        
+        if (totalSeconds >= 0 && totalSeconds <= 600) { // Max 10 minutes
+          timeRemaining = totalSeconds;
+          updateTimerDisplay();
+        } else {
+          alert('Please enter a time between 0:00 and 10:00');
+        }
+      } else {
+        alert('Invalid format. Please use MM:SS (e.g., 3:00)');
+      }
+    }
   }
 
   function submitMatch(winnerId) {

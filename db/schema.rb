@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_02_003134) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_02_090855) do
   create_table "brackets", force: :cascade do |t|
     t.integer "round"
     t.integer "position"
@@ -64,6 +64,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_02_003134) do
     t.index ["winner_id"], name: "index_matches_on_winner_id"
   end
 
+  create_table "penalties", force: :cascade do |t|
+    t.integer "fighter_id", null: false
+    t.integer "match_id", null: false
+    t.string "card_type", null: false
+    t.text "reason"
+    t.datetime "issued_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["card_type"], name: "index_penalties_on_card_type"
+    t.index ["fighter_id", "issued_at"], name: "index_penalties_on_fighter_id_and_issued_at"
+    t.index ["fighter_id"], name: "index_penalties_on_fighter_id"
+    t.index ["match_id"], name: "index_penalties_on_match_id"
+  end
+
   create_table "pool_fighters", force: :cascade do |t|
     t.integer "pool_id", null: false
     t.integer "fighter_id", null: false
@@ -114,4 +128,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_02_003134) do
   add_foreign_key "matches", "weapons", column: "fighter1_offhand_id"
   add_foreign_key "matches", "weapons", column: "fighter2_main_id"
   add_foreign_key "matches", "weapons", column: "fighter2_offhand_id"
+  add_foreign_key "penalties", "fighters"
+  add_foreign_key "penalties", "matches"
 end

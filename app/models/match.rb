@@ -9,6 +9,8 @@ class Match < ApplicationRecord
   belongs_to :fighter2_main, class_name: 'Weapon', optional: true
   belongs_to :fighter2_offhand, class_name: 'Weapon', optional: true
 
+  has_many :penalties, dependent: :destroy
+
   validates :status, presence: true
 
   DEBUFFS = {
@@ -83,5 +85,13 @@ class Match < ApplicationRecord
     end
 
     save
+  end
+
+  def fighter1_penalties
+    penalties.where(fighter_id: fighter1_id).recent
+  end
+
+  def fighter2_penalties
+    penalties.where(fighter_id: fighter2_id).recent
   end
 end
