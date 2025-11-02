@@ -1,0 +1,227 @@
+<!-- app/views/matches/display.html.erb -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Match Display</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      overflow: hidden;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #ffd700;
+      animation: fall linear forwards;
+    }
+    
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    .winner-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    .winner-text {
+      animation: zoomIn 0.8s ease-out, float 2s ease-in-out infinite 0.8s;
+    }
+  </style>
+</head>
+<body class="h-screen flex items-center justify-center p-8">
+  <!-- Winner Overlay -->
+  <div id="winner-overlay" class="winner-overlay">
+    <div class="text-center winner-text">
+      <div class="text-9xl mb-8">🏆</div>
+      <div id="winner-name" class="text-8xl font-black text-yellow-400 mb-6 drop-shadow-2xl"></div>
+      <div class="text-6xl font-bold text-white drop-shadow-xl">WINS!</div>
+    </div>
+  </div>
+
+  <div class="w-full h-full flex flex-col justify-between">
+    <!-- Timer -->
+    <div class="text-center mb-8">
+      <div id="display-timer" class="text-[14rem] font-black text-white mb-2 drop-shadow-2xl leading-none">3:00</div>
+      <div id="timer-status" class="text-4xl text-white opacity-90 font-semibold"></div>
+    </div>
+
+    <!-- Scores -->
+    <div class="grid grid-cols-2 gap-16 flex-1">
+      <!-- Fighter 1 -->
+      <div class="bg-white bg-opacity-95 backdrop-blur rounded-3xl p-16 shadow-2xl border-[12px] border-indigo-500 flex flex-col justify-between">
+        <div class="text-center">
+          <div class="text-5xl font-black text-gray-800 mb-6"><%= @match.fighter1.name %></div>
+          <div class="text-3xl text-gray-600 mb-8"><%= @match.fighter1.club %></div>
+        </div>
+        <div class="text-center flex-1 flex items-center justify-center">
+          <div id="display-fighter1-score" class="text-[16rem] font-black text-indigo-600 leading-none">0</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl text-gray-500 font-bold">POINTS</div>
+        </div>
+      </div>
+
+      <!-- Fighter 2 -->
+      <div class="bg-white bg-opacity-95 backdrop-blur rounded-3xl p-16 shadow-2xl border-[12px] border-purple-500 flex flex-col justify-between">
+        <div class="text-center">
+          <div class="text-5xl font-black text-gray-800 mb-6"><%= @match.fighter2.name %></div>
+          <div class="text-3xl text-gray-600 mb-8"><%= @match.fighter2.club %></div>
+        </div>
+        <div class="text-center flex-1 flex items-center justify-center">
+          <div id="display-fighter2-score" class="text-[16rem] font-black text-purple-600 leading-none">0</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl text-gray-500 font-bold">POINTS</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Match Info -->
+    <div class="mt-8 text-center">
+      <div class="inline-block bg-white bg-opacity-95 backdrop-blur rounded-2xl px-12 py-6 shadow-xl">
+        <div class="text-xl text-gray-600 font-semibold mb-4">WEAPONS</div>
+        <div class="grid grid-cols-2 gap-12 text-2xl">
+          <div>
+            <span class="font-bold text-indigo-700"><%= @match.fighter1.name %>:</span>
+            <span class="text-gray-700">
+              <%= @match.fighter1_main&.name || 'N/A' %>
+              <% if @match.fighter1_offhand %>
+                + <%= @match.fighter1_offhand.name %>
+              <% end %>
+            </span>
+            <% if @match.fighter1_debuff && @match.fighter1_debuff != 'None' %>
+              <div class="text-red-600 font-semibold mt-2">Debuff: <%= @match.fighter1_debuff %></div>
+            <% end %>
+          </div>
+          <div>
+            <span class="font-bold text-purple-700"><%= @match.fighter2.name %>:</span>
+            <span class="text-gray-700">
+              <%= @match.fighter2_main&.name || 'N/A' %>
+              <% if @match.fighter2_offhand %>
+                + <%= @match.fighter2_offhand.name %>
+              <% end %>
+            </span>
+            <% if @match.fighter2_debuff && @match.fighter2_debuff != 'None' %>
+              <div class="text-red-600 font-semibold mt-2">Debuff: <%= @match.fighter2_debuff %></div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fighter1Name = '<%= @match.fighter1.name %>';
+    const fighter2Name = '<%= @match.fighter2.name %>';
+    
+    function createConfetti() {
+      const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#a29bfe', '#fd79a8'];
+      const confettiCount = 150;
+      
+      for (let i = 0; i < confettiCount; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + '%';
+          confetti.style.top = '-10px';
+          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+          confetti.style.animationDelay = '0s';
+          confetti.style.width = (Math.random() * 10 + 5) + 'px';
+          confetti.style.height = (Math.random() * 10 + 5) + 'px';
+          
+          document.getElementById('winner-overlay').appendChild(confetti);
+          
+          setTimeout(() => confetti.remove(), 5000);
+        }, i * 30);
+      }
+    }
+    
+    function showWinner(winnerName) {
+      document.getElementById('winner-name').textContent = winnerName;
+      document.getElementById('winner-overlay').style.display = 'flex';
+      createConfetti();
+      
+      // Create continuous confetti for 10 seconds
+      const confettiInterval = setInterval(createConfetti, 1000);
+      setTimeout(() => clearInterval(confettiInterval), 10000);
+    }
+    
+    // Listen for messages from parent window
+    window.addEventListener('message', function(event) {
+      console.log('Display received message:', event.data);
+      
+      if (event.data.type === 'scoreUpdate') {
+        document.getElementById('display-fighter1-score').textContent = event.data.fighter1Score;
+        document.getElementById('display-fighter2-score').textContent = event.data.fighter2Score;
+        document.getElementById('display-timer').textContent = event.data.timer;
+        
+        // Update timer status
+        const statusEl = document.getElementById('timer-status');
+        if (event.data.timerRunning) {
+          statusEl.textContent = '⏱️ IN PROGRESS';
+          statusEl.className = 'text-4xl text-green-300 font-semibold animate-pulse';
+        } else {
+          statusEl.textContent = '⏸️ PAUSED';
+          statusEl.className = 'text-4xl text-yellow-300 font-semibold';
+        }
+      }
+      
+      if (event.data.type === 'matchWinner') {
+        const winnerId = event.data.winnerId;
+        const winnerName = winnerId === '<%= @match.fighter1_id %>' ? fighter1Name : fighter2Name;
+        showWinner(winnerName);
+      }
+    });
+
+    // Request initial data from parent when window loads
+    window.addEventListener('load', function() {
+      console.log('Display window loaded, requesting initial data');
+      if (window.opener && !window.opener.closed) {
+        setTimeout(function() {
+          window.opener.postMessage({ type: 'requestUpdate' }, '*');
+        }, 100);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       member do
         get :setup
         patch :record_result
+        get :display
       end
     end
 

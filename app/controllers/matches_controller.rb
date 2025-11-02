@@ -1,5 +1,9 @@
 class MatchesController < ApplicationController
-  before_action :set_match, only: [:show, :setup, :edit, :update, :record_result]
+  before_action :set_match, only: [ :show, :setup, :edit, :update, :record_result, :display ]
+
+  def display
+    render layout: false
+  end
 
   def index
     @pending_matches = Match.where(status: 'pending')
