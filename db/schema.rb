@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_27_073356) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_02_003134) do
   create_table "brackets", force: :cascade do |t|
     t.integer "round"
     t.integer "position"
@@ -56,6 +56,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_073356) do
     t.integer "duration"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "fighter1_starting_points", default: 0
+    t.integer "fighter2_starting_points", default: 0
     t.index ["fighter1_id"], name: "index_matches_on_fighter1_id"
     t.index ["fighter2_id"], name: "index_matches_on_fighter2_id"
     t.index ["pool_id"], name: "index_matches_on_pool_id"
@@ -99,6 +101,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_073356) do
     t.string "weapon_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "cost", default: 0
   end
 
   add_foreign_key "brackets", "fighters", column: "fighter1_id"

@@ -1,4 +1,4 @@
-<div class="px-4 sm:px-0 max-w-4xl mx-auto">
+<div class="px-4 sm:px-0 max-w-6xl mx-auto">
   <div class="mb-6">
     <%= link_to matches_path, class: "text-sm text-gray-500 hover:text-gray-700" do %>
       ← Back to Matches
@@ -7,73 +7,286 @@
 
   <div class="bg-white shadow rounded-lg p-6 mb-8">
     <h2 class="text-2xl font-bold text-gray-900 text-center mb-2">Weapon Selection</h2>
-    <p class="text-center text-gray-600 mb-8">Select weapons and debuffs for each fighter</p>
+    <p class="text-center text-gray-600 mb-8">Each fighter has 7 points to spend on weapons. Unspent points and debuffs grant bonus points.</p>
 
     <%= simple_form_for @match, url: match_path(@match), method: :patch do |f| %>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Fighter 1 -->
-        <div class="border-2 border-indigo-200 rounded-lg p-6 bg-indigo-50">
-          <h3 class="text-xl font-bold text-gray-900 mb-4"><%= @match.fighter1.name %></h3>
+        <div class="border-4 border-red-200 rounded-lg p-6 bg-red-50">
+          <h3 class="text-xl font-bold text-gray-900 mb-2"><%= @match.fighter1.name %></h3>
           <p class="text-sm text-gray-600 mb-6"><%= @match.fighter1.club %></p>
+          
+          <!-- Budget Display -->
+          <div class="mb-6 p-4 bg-white rounded-lg border-2 border-red-300">
+            <div class="text-sm font-medium text-gray-700 mb-2">Budget Tracker</div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-gray-600">Total Budget:</span>
+              <span class="text-lg font-bold text-gray-900">7 pts</span>
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-gray-600">Spent:</span>
+              <span id="fighter1-spent" class="text-lg font-bold text-red-600">0 pts</span>
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-gray-600">Remaining:</span>
+              <span id="fighter1-remaining" class="text-lg font-bold text-green-600">7 pts</span>
+            </div>
+            <div class="pt-2 border-t border-gray-200">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-red-700">Bonus Points:</span>
+                <span id="fighter1-bonus" class="text-xl font-black text-red-700">7 pts</span>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Remaining + Debuff bonus</p>
+            </div>
+          </div>
           
           <div class="space-y-4">
             <div>
               <%= f.label :fighter1_main_id, "Main Weapon", class: "block text-sm font-medium text-gray-700 mb-2" %>
               <%= f.collection_select :fighter1_main_id, @main_weapons, :id, :name, 
                   { prompt: "Select main weapon" },
-                  { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+                  { class: "weapon-select mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm rounded-md",
+                    data: { fighter: 'fighter1', weapon_type: 'main' } } %>
+              <p id="fighter1-main-cost" class="text-xs text-gray-500 mt-1"></p>
             </div>
             
             <div>
               <%= f.label :fighter1_offhand_id, "Off-hand Weapon (Optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
               <%= f.collection_select :fighter1_offhand_id, @off_weapons, :id, :name, 
                   { include_blank: "None" },
-                  { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+                  { class: "weapon-select mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm rounded-md",
+                    data: { fighter: 'fighter1', weapon_type: 'offhand' } } %>
+              <p id="fighter1-offhand-cost" class="text-xs text-gray-500 mt-1"></p>
             </div>
             
             <div>
-              <%= f.label :fighter1_debuff, "Debuff", class: "block text-sm font-medium text-gray-700 mb-2" %>
-              <%= f.select :fighter1_debuff, Match::DEBUFFS, 
+              <%= f.label :fighter1_debuff, "Debuff (Optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= f.select :fighter1_debuff, Match::DEBUFFS.keys, 
                   {},
-                  { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+                  { class: "debuff-select mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm rounded-md",
+                    data: { fighter: 'fighter1' } } %>
+              <p id="fighter1-debuff-bonus" class="text-xs text-gray-500 mt-1"></p>
             </div>
           </div>
         </div>
 
         <!-- Fighter 2 -->
-        <div class="border-2 border-purple-200 rounded-lg p-6 bg-purple-50">
-          <h3 class="text-xl font-bold text-gray-900 mb-4"><%= @match.fighter2.name %></h3>
+        <div class="border-4 border-sky-200 rounded-lg p-6 bg-sky-50">
+          <h3 class="text-xl font-bold text-gray-900 mb-2"><%= @match.fighter2.name %></h3>
           <p class="text-sm text-gray-600 mb-6"><%= @match.fighter2.club %></p>
+          
+          <!-- Budget Display -->
+          <div class="mb-6 p-4 bg-white rounded-lg border-2 border-sky-300">
+            <div class="text-sm font-medium text-gray-700 mb-2">Budget Tracker</div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-gray-600">Total Budget:</span>
+              <span class="text-lg font-bold text-gray-900">7 pts</span>
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-gray-600">Spent:</span>
+              <span id="fighter2-spent" class="text-lg font-bold text-red-600">0 pts</span>
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-gray-600">Remaining:</span>
+              <span id="fighter2-remaining" class="text-lg font-bold text-green-600">7 pts</span>
+            </div>
+            <div class="pt-2 border-t border-gray-200">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-sky-700">Bonus Points:</span>
+                <span id="fighter2-bonus" class="text-xl font-black text-sky-700">7 pts</span>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Remaining + Debuff bonus</p>
+            </div>
+          </div>
           
           <div class="space-y-4">
             <div>
               <%= f.label :fighter2_main_id, "Main Weapon", class: "block text-sm font-medium text-gray-700 mb-2" %>
               <%= f.collection_select :fighter2_main_id, @main_weapons, :id, :name, 
                   { prompt: "Select main weapon" },
-                  { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+                  { class: "weapon-select mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm rounded-md",
+                    data: { fighter: 'fighter2', weapon_type: 'main' } } %>
+              <p id="fighter2-main-cost" class="text-xs text-gray-500 mt-1"></p>
             </div>
             
             <div>
               <%= f.label :fighter2_offhand_id, "Off-hand Weapon (Optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
               <%= f.collection_select :fighter2_offhand_id, @off_weapons, :id, :name, 
                   { include_blank: "None" },
-                  { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+                  { class: "weapon-select mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm rounded-md",
+                    data: { fighter: 'fighter2', weapon_type: 'offhand' } } %>
+              <p id="fighter2-offhand-cost" class="text-xs text-gray-500 mt-1"></p>
             </div>
             
             <div>
-              <%= f.label :fighter2_debuff, "Debuff", class: "block text-sm font-medium text-gray-700 mb-2" %>
-              <%= f.select :fighter2_debuff, Match::DEBUFFS, 
+              <%= f.label :fighter2_debuff, "Debuff (Optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= f.select :fighter2_debuff, Match::DEBUFFS.keys, 
                   {},
-                  { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+                  { class: "debuff-select mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm rounded-md",
+                    data: { fighter: 'fighter2' } } %>
+              <p id="fighter2-debuff-bonus" class="text-xs text-gray-500 mt-1"></p>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Starting Points Preview -->
+      <div class="mt-8 p-6 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+        <h3 class="text-lg font-bold text-gray-900 mb-4 text-center">Starting Point Advantage</h3>
+        <div class="grid grid-cols-2 gap-8 text-center">
+          <div>
+            <div class="text-sm text-gray-600 mb-2"><%= @match.fighter1.name %></div>
+            <div id="fighter1-starting" class="text-5xl font-black text-red-600">0</div>
+            <div class="text-xs text-gray-500 mt-2">Starting Points</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-600 mb-2"><%= @match.fighter2.name %></div>
+            <div id="fighter2-starting" class="text-5xl font-black text-sky-600">0</div>
+            <div class="text-xs text-gray-500 mt-2">Starting Points</div>
+          </div>
+        </div>
+        <p class="text-sm text-gray-600 text-center mt-4">The fighter with more bonus points starts with a point advantage equal to the difference.</p>
+      </div>
+
       <div class="mt-8 flex justify-end space-x-4">
         <%= link_to "Cancel", matches_path, class: "inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
-        <%= f.submit "Continue to Scoring", class: "inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
+        <%= f.submit "Continue to Scoring", id: "submit-btn", class: "inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700" %>
       </div>
     <% end %>
   </div>
 </div>
+
+<script>
+  // Weapon costs data
+  const weaponCosts = {
+    <% @main_weapons.each do |weapon| %>
+      <%= weapon.id %>: <%= weapon.cost %>,
+    <% end %>
+    <% @off_weapons.each do |weapon| %>
+      <%= weapon.id %>: <%= weapon.cost %>,
+    <% end %>
+  };
+  
+  // Debuff bonuses
+  const debuffBonuses = <%= raw Match::DEBUFFS.to_json %>;
+  
+  // Fighter budgets
+  const fighterBudgets = {
+    fighter1: { main: 0, offhand: 0, debuff: 0 },
+    fighter2: { main: 0, offhand: 0, debuff: 0 }
+  };
+  
+  function updateBudget(fighter) {
+    const spent = fighterBudgets[fighter].main + fighterBudgets[fighter].offhand;
+    const remaining = 7 - spent;
+    const bonus = remaining + fighterBudgets[fighter].debuff;
+    
+    document.getElementById(`${fighter}-spent`).textContent = `${spent} pts`;
+    document.getElementById(`${fighter}-remaining`).textContent = `${remaining} pts`;
+    document.getElementById(`${fighter}-bonus`).textContent = `${bonus} pts`;
+    
+    // Check if over budget
+    const submitBtn = document.getElementById('submit-btn');
+    if (spent > 7) {
+      document.getElementById(`${fighter}-spent`).classList.add('text-red-700');
+      document.getElementById(`${fighter}-spent`).classList.remove('text-red-600');
+      document.getElementById(`${fighter}-remaining`).classList.add('text-red-700');
+      document.getElementById(`${fighter}-remaining`).classList.remove('text-green-600');
+      submitBtn.disabled = true;
+      submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+      document.getElementById(`${fighter}-spent`).classList.remove('text-red-700');
+      document.getElementById(`${fighter}-spent`).classList.add('text-red-600');
+      document.getElementById(`${fighter}-remaining`).classList.remove('text-red-700');
+      document.getElementById(`${fighter}-remaining`).classList.add('text-green-600');
+      
+      // Check if other fighter is also valid
+      const otherFighter = fighter === 'fighter1' ? 'fighter2' : 'fighter1';
+      const otherSpent = fighterBudgets[otherFighter].main + fighterBudgets[otherFighter].offhand;
+      if (otherSpent <= 7) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+    
+    updateStartingPoints();
+  }
+  
+  function updateStartingPoints() {
+    const f1Bonus = 7 - fighterBudgets.fighter1.main - fighterBudgets.fighter1.offhand + fighterBudgets.fighter1.debuff;
+    const f2Bonus = 7 - fighterBudgets.fighter2.main - fighterBudgets.fighter2.offhand + fighterBudgets.fighter2.debuff;
+    
+    const difference = f1Bonus - f2Bonus;
+    
+    if (difference > 0) {
+      document.getElementById('fighter1-starting').textContent = difference;
+      document.getElementById('fighter2-starting').textContent = 0;
+    } else if (difference < 0) {
+      document.getElementById('fighter1-starting').textContent = 0;
+      document.getElementById('fighter2-starting').textContent = Math.abs(difference);
+    } else {
+      document.getElementById('fighter1-starting').textContent = 0;
+      document.getElementById('fighter2-starting').textContent = 0;
+    }
+  }
+  
+  // Weapon select handlers
+  document.querySelectorAll('.weapon-select').forEach(select => {
+    select.addEventListener('change', function() {
+      const fighter = this.dataset.fighter;
+      const weaponType = this.dataset.weaponType;
+      const weaponId = this.value;
+      const cost = weaponId ? weaponCosts[weaponId] : 0;
+      
+      fighterBudgets[fighter][weaponType] = cost;
+      
+      // Update cost display
+      const costElement = document.getElementById(`${fighter}-${weaponType}-cost`);
+      if (cost > 0) {
+        costElement.textContent = `Cost: ${cost} points`;
+        costElement.classList.add('text-red-600', 'font-semibold');
+      } else {
+        costElement.textContent = '';
+      }
+      
+      updateBudget(fighter);
+    });
+  });
+  
+  // Debuff select handlers
+  document.querySelectorAll('.debuff-select').forEach(select => {
+    select.addEventListener('change', function() {
+      const fighter = this.dataset.fighter;
+      const debuff = this.value;
+      const bonus = debuffBonuses[debuff] || 0;
+      
+      fighterBudgets[fighter].debuff = bonus;
+      
+      // Update debuff display
+      const bonusElement = document.getElementById(`${fighter}-debuff-bonus`);
+      if (bonus > 0) {
+        bonusElement.textContent = `Bonus: +${bonus} points`;
+        bonusElement.classList.add('text-green-600', 'font-semibold');
+      } else {
+        bonusElement.textContent = '';
+      }
+      
+      updateBudget(fighter);
+    });
+  });
+  
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.weapon-select').forEach(select => {
+      if (select.value) {
+        select.dispatchEvent(new Event('change'));
+      }
+    });
+    
+    document.querySelectorAll('.debuff-select').forEach(select => {
+      if (select.value) {
+        select.dispatchEvent(new Event('change'));
+      }
+    });
+  });
+</script>

@@ -24,7 +24,8 @@ class MatchesController < ApplicationController
 
   def update
     if @match.update(weapon_params)
-      redirect_to edit_match_path(@match), notice: 'Weapons selected. Ready to score match.'
+      @match.calculate_starting_points
+      redirect_to edit_match_path(@match), notice: 'Weapons selected. Starting points calculated. Ready to score match..'
     else
       @main_weapons = Weapon.main_hand.order(:name)
       @off_weapons = Weapon.off_hand.order(:name)

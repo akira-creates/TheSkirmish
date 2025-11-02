@@ -1,5 +1,5 @@
 class WeaponsController < ApplicationController
-    before_action :set_weapon, only: [:edit, :update, :destroy]
+    before_action :set_weapon, only: [ :edit, :update, :destroy ]
 
   def index
     @weapons = Weapon.order(:weapon_type, :name)
@@ -40,6 +40,6 @@ class WeaponsController < ApplicationController
   end
 
   def weapon_params
-    params.require(:weapon).permit(:name, :weapon_type)
+    params.require(:weapon).permit(:name, :weapon_type, :cost)
   end
 end

@@ -14,6 +14,8 @@ class CreateMatches < ActiveRecord::Migration[8.0]
       t.string :fighter2_debuff
       t.integer :fighter1_points
       t.integer :fighter2_points
+      t.integer :fighter1_starting_points, default: 0
+      t.integer :fighter2_starting_points, default: 0
       t.integer :duration
 
       t.timestamps

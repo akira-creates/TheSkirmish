@@ -8,7 +8,7 @@
       <div class="p-5">
         <div class="flex items-center">
           <div class="flex-shrink-0">
-            <div class="rounded-md bg-indigo-500 p-3">
+            <div class="rounded-md bg-red-500 p-3">
               <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
@@ -23,7 +23,7 @@
         </div>
       </div>
       <div class="bg-gray-50 px-5 py-3">
-        <%= link_to "Manage Fighters", fighters_path, class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" %>
+        <%= link_to "Manage Fighters", fighters_path, class: "text-sm font-medium text-red-600 hover:text-red-500" %>
       </div>
     </div>
 
@@ -80,7 +80,7 @@
       <div class="p-5">
         <div class="flex items-center">
           <div class="flex-shrink-0">
-            <div class="rounded-md bg-purple-500 p-3">
+            <div class="rounded-md bg-sky-500 p-3">
               <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
@@ -95,7 +95,7 @@
         </div>
       </div>
       <div class="bg-gray-50 px-5 py-3">
-        <%= link_to "View Brackets", brackets_path, class: "text-sm font-medium text-purple-600 hover:text-purple-500" %>
+        <%= link_to "View Brackets", brackets_path, class: "text-sm font-medium text-sky-600 hover:text-sky-500" %>
       </div>
     </div>
   </div>
@@ -104,7 +104,7 @@
   <div class="bg-white shadow rounded-lg p-6 mb-8">
     <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <%= link_to new_fighter_path, class: "inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" do %>
+      <%= link_to new_fighter_path, class: "inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700" do %>
         <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
@@ -125,7 +125,7 @@
         Score Match
       <% end %>
 
-      <%= link_to new_bracket_path, class: "inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700" do %>
+      <%= link_to new_bracket_path, class: "inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700" do %>
         <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
@@ -140,7 +140,7 @@
     <div class="space-y-4">
       <div class="flex items-start">
         <div class="flex-shrink-0">
-          <div class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 font-semibold">1</div>
+          <div class="flex items-center justify-center h-8 w-8 rounded-full bg-red-100 text-red-600 font-semibold">1</div>
         </div>
         <div class="ml-4">
           <h4 class="text-sm font-medium text-gray-900">Register Fighters & Add Weapons</h4>
@@ -150,7 +150,7 @@
 
       <div class="flex items-start">
         <div class="flex-shrink-0">
-          <div class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 font-semibold">2</div>
+          <div class="flex items-center justify-center h-8 w-8 rounded-full bg-red-100 text-red-600 font-semibold">2</div>
         </div>
         <div class="ml-4">
           <h4 class="text-sm font-medium text-gray-900">Generate Pools</h4>
@@ -160,7 +160,7 @@
 
       <div class="flex items-start">
         <div class="flex-shrink-0">
-          <div class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 font-semibold">3</div>
+          <div class="flex items-center justify-center h-8 w-8 rounded-full bg-red-100 text-red-600 font-semibold">3</div>
         </div>
         <div class="ml-4">
           <h4 class="text-sm font-medium text-gray-900">Run Pool Matches</h4>
@@ -170,7 +170,7 @@
 
       <div class="flex items-start">
         <div class="flex-shrink-0">
-          <div class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 font-semibold">4</div>
+          <div class="flex items-center justify-center h-8 w-8 rounded-full bg-red-100 text-red-600 font-semibold">4</div>
         </div>
         <div class="ml-4">
           <h4 class="text-sm font-medium text-gray-900">Complete Pools</h4>
@@ -180,7 +180,7 @@
 
       <div class="flex items-start">
         <div class="flex-shrink-0">
-          <div class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 font-semibold">5</div>
+          <div class="flex items-center justify-center h-8 w-8 rounded-full bg-red-100 text-red-600 font-semibold">5</div>
         </div>
         <div class="ml-4">
           <h4 class="text-sm font-medium text-gray-900">Generate Elimination Brackets</h4>
@@ -190,7 +190,7 @@
 
       <div class="flex items-start">
         <div class="flex-shrink-0">
-          <div class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 font-semibold">6</div>
+          <div class="flex items-center justify-center h-8 w-8 rounded-full bg-red-100 text-red-600 font-semibold">6</div>
         </div>
         <div class="ml-4">
           <h4 class="text-sm font-medium text-gray-900">Run Elimination Rounds</h4>

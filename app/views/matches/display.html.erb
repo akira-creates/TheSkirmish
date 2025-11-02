@@ -87,13 +87,13 @@
     <!-- Scores -->
     <div class="grid grid-cols-2 gap-16 flex-1">
       <!-- Fighter 1 -->
-      <div class="bg-white bg-opacity-95 backdrop-blur rounded-3xl p-16 shadow-2xl border-[12px] border-indigo-500 flex flex-col justify-between">
+      <div class="bg-white bg-opacity-95 backdrop-blur rounded-3xl p-16 shadow-2xl border-[12px] border-red-500 flex flex-col justify-between">
         <div class="text-center">
           <div class="text-5xl font-black text-gray-800 mb-6"><%= @match.fighter1.name %></div>
           <div class="text-3xl text-gray-600 mb-8"><%= @match.fighter1.club %></div>
         </div>
         <div class="text-center flex-1 flex items-center justify-center">
-          <div id="display-fighter1-score" class="text-[16rem] font-black text-indigo-600 leading-none">0</div>
+          <div id="display-fighter1-score" class="text-[16rem] font-black text-red-600 leading-none">0</div>
         </div>
         <div class="text-center">
           <div class="text-3xl text-gray-500 font-bold">POINTS</div>
@@ -101,13 +101,13 @@
       </div>
 
       <!-- Fighter 2 -->
-      <div class="bg-white bg-opacity-95 backdrop-blur rounded-3xl p-16 shadow-2xl border-[12px] border-purple-500 flex flex-col justify-between">
+      <div class="bg-white bg-opacity-95 backdrop-blur rounded-3xl p-16 shadow-2xl border-[12px] border-sky-500 flex flex-col justify-between">
         <div class="text-center">
           <div class="text-5xl font-black text-gray-800 mb-6"><%= @match.fighter2.name %></div>
           <div class="text-3xl text-gray-600 mb-8"><%= @match.fighter2.club %></div>
         </div>
         <div class="text-center flex-1 flex items-center justify-center">
-          <div id="display-fighter2-score" class="text-[16rem] font-black text-purple-600 leading-none">0</div>
+          <div id="display-fighter2-score" class="text-[16rem] font-black text-sky-600 leading-none">0</div>
         </div>
         <div class="text-center">
           <div class="text-3xl text-gray-500 font-bold">POINTS</div>
@@ -121,7 +121,7 @@
         <div class="text-xl text-gray-600 font-semibold mb-4">WEAPONS</div>
         <div class="grid grid-cols-2 gap-12 text-2xl">
           <div>
-            <span class="font-bold text-indigo-700"><%= @match.fighter1.name %>:</span>
+            <span class="font-bold text-red-700"><%= @match.fighter1.name %>:</span>
             <span class="text-gray-700">
               <%= @match.fighter1_main&.name || 'N/A' %>
               <% if @match.fighter1_offhand %>
@@ -133,7 +133,7 @@
             <% end %>
           </div>
           <div>
-            <span class="font-bold text-purple-700"><%= @match.fighter2.name %>:</span>
+            <span class="font-bold text-sky-700"><%= @match.fighter2.name %>:</span>
             <span class="text-gray-700">
               <%= @match.fighter2_main&.name || 'N/A' %>
               <% if @match.fighter2_offhand %>

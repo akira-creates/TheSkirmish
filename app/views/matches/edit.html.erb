@@ -12,7 +12,7 @@
     <div class="mb-8 p-6 bg-gray-50 rounded-lg">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
         <div>
-          <h3 class="text-xl font-bold text-indigo-700"><%= @match.fighter1.name %></h3>
+          <h3 class="text-xl font-bold text-red-700"><%= @match.fighter1.name %></h3>
           <p class="text-sm text-gray-600"><%= @match.fighter1.club %></p>
           <div class="mt-2 text-sm">
             <p><strong>Main:</strong> <%= @match.fighter1_main&.name || 'N/A' %></p>
@@ -28,7 +28,7 @@
         </div>
         
         <div>
-          <h3 class="text-xl font-bold text-purple-700"><%= @match.fighter2.name %></h3>
+          <h3 class="text-xl font-bold text-sky-700"><%= @match.fighter2.name %></h3>
           <p class="text-sm text-gray-600"><%= @match.fighter2.club %></p>
           <div class="mt-2 text-sm">
             <p><strong>Main:</strong> <%= @match.fighter2_main&.name || 'N/A' %></p>
@@ -60,29 +60,29 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
         <!-- Fighter 1 Score -->
-        <div class="border-4 border-indigo-300 rounded-lg p-8 bg-indigo-50">
+        <div class="border-4 border-red-300 rounded-lg p-8 bg-red-50">
           <div class="text-center mb-6">
-            <div id="fighter1-score" class="text-8xl font-bold text-indigo-600 mb-2">0</div>
+            <div id="fighter1-score" class="text-8xl font-bold text-red-600 mb-2">0</div>
             <p class="text-sm text-gray-600 mb-4">Points</p>
             <h3 class="text-xl font-bold text-gray-900"><%= @match.fighter1.name %></h3>
             <p class="text-sm text-gray-600"><%= @match.fighter1.club %></p>
           </div>
           <div class="flex justify-center space-x-3">
-            <button onclick="addPoint('fighter1')" class="px-8 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-xl font-bold">+1</button>
+            <button onclick="addPoint('fighter1')" class="px-8 py-4 bg-red-600 text-white rounded-lg hover:bg-red-700 text-xl font-bold">+1</button>
             <button onclick="subtractPoint('fighter1')" class="px-8 py-4 bg-gray-500 text-white rounded-lg hover:bg-gray-600 text-xl font-bold">-1</button>
           </div>
         </div>
 
         <!-- Fighter 2 Score -->
-        <div class="border-4 border-purple-300 rounded-lg p-8 bg-purple-50">
+        <div class="border-4 border-sky-300 rounded-lg p-8 bg-sky-50">
           <div class="text-center mb-6">
-            <div id="fighter2-score" class="text-8xl font-bold text-purple-600 mb-2">0</div>
+            <div id="fighter2-score" class="text-8xl font-bold text-sky-600 mb-2">0</div>
             <p class="text-sm text-gray-600 mb-4">Points</p>
             <h3 class="text-xl font-bold text-gray-900"><%= @match.fighter2.name %></h3>
             <p class="text-sm text-gray-600"><%= @match.fighter2.club %></p>
           </div>
           <div class="flex justify-center space-x-3">
-            <button onclick="addPoint('fighter2')" class="px-8 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-xl font-bold">+1</button>
+            <button onclick="addPoint('fighter2')" class="px-8 py-4 bg-sky-600 text-white rounded-lg hover:bg-sky-700 text-xl font-bold">+1</button>
             <button onclick="subtractPoint('fighter2')" class="px-8 py-4 bg-gray-500 text-white rounded-lg hover:bg-gray-600 text-xl font-bold">-1</button>
           </div>
         </div>
@@ -98,11 +98,11 @@
       
       <div class="text-center">
         <button type="button" onclick="submitMatch('<%= @match.fighter1_id %>')" 
-                class="mx-2 px-8 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-lg font-bold">
+                class="mx-2 px-8 py-4 bg-red-600 text-white rounded-lg hover:bg-red-700 text-lg font-bold">
           <%= @match.fighter1.name %> Wins
         </button>
         <button type="button" onclick="submitMatch('<%= @match.fighter2_id %>')" 
-                class="mx-2 px-8 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-lg font-bold">
+                class="mx-2 px-8 py-4 bg-sky-600 text-white rounded-lg hover:bg-sky-700 text-lg font-bold">
           <%= @match.fighter2.name %> Wins
         </button>
       </div>
@@ -111,12 +111,17 @@
 </div>
 
 <script>
-  let fighter1Score = 0;
-  let fighter2Score = 0;
+  let fighter1Score = <%= @match.fighter1_starting_points || 0 %>;
+  let fighter2Score = <%= @match.fighter2_starting_points || 0 %>;
   let timeRemaining = 180; // 3 minutes in seconds
   let timerInterval = null;
   let timerRunning = false;
   let displayWindow = null;
+
+  // Initialize display with starting points
+  document.addEventListener('DOMContentLoaded', function() {
+    updateScoreDisplay();
+  });
 
   // Listen for requests from display window
   window.addEventListener('message', function(event) {

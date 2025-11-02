@@ -21,16 +21,22 @@ puts "Admin user created: admin@tournament.local / password"
 
 # Create weapons
 weapons_data = [
-  { name: 'Longsword', weapon_type: 'Two Handed' },
-  { name: 'Arming Sword', weapon_type: 'Main Hand' },
-  { name: 'Rapier', weapon_type: 'Main Hand' },
-  { name: 'Saber', weapon_type: 'Main Hand' },
-  { name: 'Spear', weapon_type: 'Two Handed' },
-  { name: 'Messer', weapon_type: 'Main Hand' },
-  { name: 'Dagger', weapon_type: 'Off Hand' },
-  { name: 'Buckler', weapon_type: 'Off Hand' },
-  { name: 'Cloak', weapon_type: 'Off Hand' },
-  { name: 'Sidesword', weapon_type: 'Main Hand' }
+  # Main hand weapons
+  { name: 'Rapier', weapon_type: 'Main Hand', cost: 4 },
+  { name: 'Saber', weapon_type: 'Main Hand', cost: 3 },
+  { name: 'Sidesword', weapon_type: 'Main Hand', cost: 3 },
+  { name: 'Messer', weapon_type: 'Main Hand', cost: 2 },
+  { name: 'Arming Sword', weapon_type: 'Main Hand', cost: 2 },
+
+  # Off hand weapons
+  { name: 'Kite Shield', weapon_type: 'Off Hand', cost: 3 },
+  { name: 'Dagger', weapon_type: 'Off Hand', cost: 2 },
+  { name: 'Buckler', weapon_type: 'Off Hand', cost: 2 },
+  { name: 'Cloak', weapon_type: 'Off Hand', cost: 2 },
+  { name: 'Rubber Chicken', weapon_type: 'Off Hand', cost: 1 },
+  { name: 'Cardboard box', weapon_type: 'Off Hand', cost: 1 },
+  { name: 'Kitchen pot/pan', weapon_type: 'Off Hand', cost: 1 },
+  { name: 'Rope', weapon_type: 'Off Hand', cost: 1 }
 ]
 
 weapons_data.each do |weapon_data|
@@ -40,7 +46,7 @@ end
 puts "#{Weapon.count} weapons created"
 
 # Create sample fighters
-clubs = [ 'A', 'B', 'C', 'D' ]
+clubs = [ 'Southern Cross Swords' ]
 
 puts "How many fighters would you like to create? "
 gets.chomp.to_i.times do |i|
