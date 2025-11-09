@@ -1,5 +1,5 @@
 class FightersController < ApplicationController
-  before_action :set_fighter, only: [:show, :edit, :update, :destroy]
+  before_action :set_fighter, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @fighters = Fighter.order(:club, :name)

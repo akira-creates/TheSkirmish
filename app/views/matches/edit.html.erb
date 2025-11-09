@@ -182,6 +182,7 @@
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
         <!-- Fighter 1 Penalties -->
+        <turbo-frame id="fighter1-penalties">
         <div class="bg-white rounded-lg shadow-lg p-6 border-2 border-red-200">
           <h4 class="text-lg font-bold text-gray-900 mb-4"><%= @match.fighter1.name %></h4>
           
@@ -235,14 +236,15 @@
           <!-- Issue Penalty Form -->
           <div class="pt-4 border-t border-gray-200">
             <div class="text-xs font-semibold text-gray-700 mb-2">ISSUE PENALTY:</div>
-            <%= form_with url: [@match, Penalty.new], method: :post, local: true do |f| %>
-              <%= f.hidden_field :fighter_id, value: @match.fighter1_id %>
+            <%= form_with url: match_penalties_path(@match), method: :post do |f| %>
+              <%= hidden_field_tag 'penalty[fighter_id]', @match.fighter1_id %>
               <div class="space-y-2">
-                <%= f.select :card_type, 
-                    [['yellow', 'Yelllow Card (Warning)'], ['red', 'Red Card (-3 pts)'], ['black', 'Black Card (Expulsion)']], 
-                    { prompt: 'Select card type' },
-                    { class: 'block w-full text-sm border-gray-300 rounded-md mb-2' } %>
-                <%= f.text_area :reason, 
+                <%= select_tag 'penalty[card_type]',
+                    options_for_select([['Yellow Card (Warning)', 'yellow'], ['Red Card (-3 pts)', 'red'], ['Black Card (Expulsion)', 'black']]),
+                    prompt: 'Select card type',
+                    class: 'block w-full text-sm border-gray-300 rounded-md mb-2' %>
+                <%= text_area_tag 'penalty[reason]',
+                    nil,
                     placeholder: 'Reason (optional)', 
                     rows: 2,
                     class: 'block w-full text-sm border-gray-300 rounded-md mb-2' %>
@@ -251,8 +253,10 @@
             <% end %>
           </div>
         </div>
+        </turbo-frame>
 
         <!-- Fighter 2 Penalties -->
+        <turbo-frame id="fighter2-penalties">
         <div class="bg-white rounded-lg shadow-lg p-6 border-2 border-sky-200">
           <h4 class="text-lg font-bold text-gray-900 mb-4"><%= @match.fighter2.name %></h4>
           
@@ -278,7 +282,7 @@
                     </div>
                     <%= button_to "×", match_penalty_path(@match, penalty), method: :delete, 
                         class: "ml-2 text-lg font-bold #{penalty.card_type == 'black' ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}", 
-                        data: { confirm: "Remove this penalty?" },
+                        data: { confirm: "Remove this penalty?", turbo: false },
                         form: { style: "display: inline;" } %>
                   </div>
                 </div>
@@ -306,14 +310,15 @@
           <!-- Issue Penalty Form -->
           <div class="pt-4 border-t border-gray-200">
             <div class="text-xs font-semibold text-gray-700 mb-2">ISSUE PENALTY:</div>
-            <%= form_with url: match_penalties_path(@match), method: :post, local: true do |f| %>
-              <%= f.hidden_field :fighter_id, value: @match.fighter2_id %>
+            <%= form_with url: match_penalties_path(@match), method: :post do |f| %>
+              <%= hidden_field_tag 'penalty[fighter_id]', @match.fighter2_id %>
               <div class="space-y-2">
-                <%= f.select :card_type, 
-                    [['Yellow Card (Warning)', 'yellow'], ['Red Card (-3 pts)', 'red'], ['Black Card (Expulsion)', 'black']], 
-                    { prompt: 'Select card type' },
-                    { class: 'block w-full text-sm border-gray-300 rounded-md mb-2' } %>
-                <%= f.text_area :reason, 
+                <%= select_tag 'penalty[card_type]',
+                    options_for_select([['Yellow Card (Warning)', 'yellow'], ['Red Card (-3 pts)', 'red'], ['Black Card (Expulsion)', 'black']]),
+                    prompt: 'Select card type',
+                    class: 'block w-full text-sm border-gray-300 rounded-md mb-2' %>
+                <%= text_area_tag 'penalty[reason]',
+                    nil,
                     placeholder: 'Reason (optional)', 
                     rows: 2,
                     class: 'block w-full text-sm border-gray-300 rounded-md mb-2' %>
@@ -323,6 +328,7 @@
           </div>
         </div>
       </div>
+      </turbo-frame>
     </div>
 
     <!-- Submit Form -->
@@ -347,6 +353,9 @@
 </div>
 
 <script>
+  const matchId = '<%= @match.id %>';
+  const storageKey = `match_${matchId}_state`;
+  
   let fighter1Score = <%= @match.fighter1_starting_points || 0 %>;
   let fighter2Score = <%= @match.fighter2_starting_points || 0 %>;
   let timeRemaining = 180; // 3 minutes in seconds
@@ -354,10 +363,47 @@
   let timerRunning = false;
   let displayWindow = null;
 
+  // Load saved state from sessionStorage
+  function loadSavedState() {
+    const savedState = sessionStorage.getItem(storageKey);
+    if (savedState) {
+      try {
+        const state = JSON.parse(savedState);
+        fighter1Score = state.fighter1Score || <%= @match.fighter1_starting_points || 0 %>;
+        fighter2Score = state.fighter2Score || <%= @match.fighter2_starting_points || 0 %>;
+        timeRemaining = state.timeRemaining || 180;
+        console.log('Loaded saved state:', state);
+      } catch (e) {
+        console.error('Failed to load saved state:', e);
+      }
+    }
+  }
+
+  // Save current state to sessionStorage
+  function saveState() {
+    const state = {
+      fighter1Score: fighter1Score,
+      fighter2Score: fighter2Score,
+      timeRemaining: timeRemaining,
+      timestamp: Date.now()
+    };
+    sessionStorage.setItem(storageKey, JSON.stringify(state));
+  }
+
+  // Clear saved state (called on match submission)
+  function clearSavedState() {
+    sessionStorage.removeItem(storageKey);
+  }
+
   // Initialize display with starting points
   document.addEventListener('DOMContentLoaded', function() {
+    loadSavedState();
     updateScoreDisplay();
+    updateTimerDisplay();
   });
+
+  // Auto-save every 2 seconds
+  setInterval(saveState, 2000);
 
   // Listen for requests from display window
   window.addEventListener('message', function(event) {
@@ -373,7 +419,7 @@
     document.getElementById('fighter1_points_input').value = fighter1Score;
     document.getElementById('fighter2_points_input').value = fighter2Score;
     
-    // Update display window if open
+    saveState(); // Save on score update
     updateDisplayWindow();
   }
 
@@ -383,7 +429,6 @@
     const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
     document.getElementById('timer').textContent = timeString;
     
-    // Update display window if open
     updateDisplayWindow();
   }
 
@@ -422,13 +467,11 @@
       `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no,status=no,toolbar=no,menubar=no`
     );
     
-    // Send initial data once window loads
     if (displayWindow) {
       displayWindow.addEventListener('load', function() {
         updateDisplayWindow();
       });
       
-      // Also try sending after a short delay in case load event doesn't fire
       setTimeout(updateDisplayWindow, 500);
     }
   }
@@ -451,9 +494,9 @@
   }
 
   function subtractPoint(fighter) {
-    if (fighter === 'fighter1' && fighter1Score > 0) {
+    if (fighter === 'fighter1') {
       fighter1Score--;
-    } else if (fighter === 'fighter2' && fighter2Score > 0) {
+    } else if (fighter === 'fighter2') {
       fighter2Score--;
     }
     updateScoreDisplay();
@@ -482,6 +525,7 @@
     clearInterval(timerInterval);
     document.getElementById('startTimer').disabled = false;
     document.getElementById('pauseTimer').disabled = true;
+    saveState(); // Save when pausing
     updateDisplayWindow();
   }
 
@@ -489,11 +533,13 @@
     pauseTimer();
     timeRemaining = 180;
     updateTimerDisplay();
+    saveState();
   }
   
   function adjustTime(seconds) {
-    timeRemaining = Math.max(0, Math.min(600, timeRemaining + seconds)); // Cap between 0 and 10 minutes
+    timeRemaining = Math.max(0, Math.min(600, timeRemaining + seconds));
     updateTimerDisplay();
+    saveState();
   }
   
   function setCustomTime() {
@@ -510,9 +556,10 @@
         const seconds = parseInt(parts[1]) || 0;
         const totalSeconds = (minutes * 60) + seconds;
         
-        if (totalSeconds >= 0 && totalSeconds <= 600) { // Max 10 minutes
+        if (totalSeconds >= 0 && totalSeconds <= 600) {
           timeRemaining = totalSeconds;
           updateTimerDisplay();
+          saveState();
         } else {
           alert('Please enter a time between 0:00 and 10:00');
         }
@@ -529,7 +576,6 @@
       }
     }
     
-    // Send winner announcement to display window
     if (displayWindow && !displayWindow.closed) {
       displayWindow.postMessage({
         type: 'matchWinner',
@@ -537,7 +583,8 @@
       }, '*');
     }
     
-    // Wait a moment for the animation to start, then submit
+    clearSavedState(); // Clear state on submission
+    
     setTimeout(function() {
       const elapsedTime = 180 - timeRemaining;
       document.getElementById('duration_input').value = elapsedTime;

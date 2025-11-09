@@ -24,12 +24,21 @@ Rails.application.routes.draw do
       resources :penalties, only: [ :create, :destroy ]
     end
 
-    resources :brackets do
+      resources :brackets do
       collection do
-        post :generate
+        # REMOVED: get :new
+        # REMOVED: post :create
+        # 'resources :brackets' already defines the routes for 'new' and 'create'
+        # (GET /brackets/new and POST /brackets).
+        # Adding them here was causing the routing conflict.
+
+        # This custom collection route is good.
+        post :generate_matches
       end
       member do
-        patch :record_result
+        # This custom member route is good.
+        # Changed to 'post' as it changes state, but 'patch' is also fine.
+        post :record_result
       end
     end
   end

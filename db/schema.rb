@@ -10,20 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_02_090855) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_08_010400) do
   create_table "brackets", force: :cascade do |t|
     t.integer "round"
     t.integer "position"
-    t.integer "fighter1_id", null: false
-    t.integer "fighter2_id", null: false
+    t.integer "fighter1_id"
+    t.integer "fighter2_id"
     t.integer "winner_id"
     t.boolean "completed"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "bracket_type"
     t.integer "loser_id"
+    t.integer "match_id"
     t.index ["fighter1_id"], name: "index_brackets_on_fighter1_id"
     t.index ["fighter2_id"], name: "index_brackets_on_fighter2_id"
+    t.index ["match_id"], name: "index_brackets_on_match_id"
     t.index ["winner_id"], name: "index_brackets_on_winner_id"
   end
 
@@ -121,6 +123,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_02_090855) do
   add_foreign_key "brackets", "fighters", column: "fighter1_id"
   add_foreign_key "brackets", "fighters", column: "fighter2_id"
   add_foreign_key "brackets", "fighters", column: "winner_id"
+  add_foreign_key "brackets", "matches"
   add_foreign_key "matches", "fighters", column: "fighter1_id"
   add_foreign_key "matches", "fighters", column: "fighter2_id"
   add_foreign_key "matches", "fighters", column: "winner_id"

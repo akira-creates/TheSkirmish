@@ -4,11 +4,13 @@
       <h2 class="text-3xl font-bold text-gray-900">Elimination Brackets</h2>
       <p class="mt-2 text-sm text-gray-700">Double elimination tournament brackets.</p>
     </div>
-    <% if @winners_brackets.empty? %>
-      <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-        <%= link_to "Generate Brackets", new_bracket_path, class: "inline-flex items-center justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700" %>
-      </div>
-    <% end %>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex space-x-3">
+      <% if @winners_brackets.empty? %>
+        <%= link_to "Generate Brackets", new_bracket_path, class: "inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700" %>
+      <% else %>
+        <%= button_to "Generate Matches", generate_matches_brackets_path, method: :post, class: "inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700" %>
+      <% end %>
+    </div>
   </div>
 
   <% if @winners_brackets.any? || @losers_brackets.any? %>
@@ -22,13 +24,16 @@
             <h4 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">
               Round <%= round %> 
               <% if round == @winners_brackets.maximum(:round) %>
-                <span class="text-sky-600">(Finals)</span>
+                <span class="text-purple-600">(Finals)</span>
               <% end %>
             </h4>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               <% brackets.sort_by(&:position).each do |bracket| %>
-                <div class="border-2 <%= bracket.completed ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-white' %> rounded-lg p-4">
-                  <div class="text-xs text-gray-500 mb-2">Match <%= bracket.position %></div>
+                <div class="border-2 <%= bracket.completed ? 'border-green-300 bg-green-50' : bracket.match ? 'border-blue-300 bg-blue-50' : 'border-gray-300 bg-white' %> rounded-lg p-4">
+                  <div class="text-xs text-gray-500 mb-2 flex items-center justify-between">
+                    <span>Match <%= bracket.position %></span>
+                    <%= link_to "Edit", edit_bracket_path(bracket), class: "text-indigo-600 hover:text-indigo-900 text-xs font-medium" %>
+                  </div>
                   
                   <!-- Fighter 1 -->
                   <div class="flex items-center justify-between mb-2 p-2 rounded <%= bracket.completed && bracket.winner_id == bracket.fighter1_id ? 'bg-green-200' : 'bg-gray-100' %>">
@@ -62,8 +67,15 @@
                     <% end %>
                   </div>
                   
-                  <% if bracket.fighter1 && bracket.fighter2 && !bracket.completed %>
-                    <%= link_to "Record Result", edit_bracket_path(bracket), class: "w-full inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700" %>
+                  <!-- Action Buttons -->
+                  <% if bracket.match %>
+                    <% if bracket.match.status == 'pending' %>
+                      <%= link_to "Score Match", setup_match_path(bracket.match), class: "w-full inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
+                    <% else %>
+                      <div class="text-center text-xs text-green-600 font-semibold">Match Completed</div>
+                    <% end %>
+                  <% elsif bracket.ready_to_fight? %>
+                    <%= button_to "Create Match", generate_matches_brackets_path, method: :post, class: "w-full inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700" %>
                   <% elsif bracket.completed %>
                     <div class="text-center text-xs text-green-600 font-semibold">Completed</div>
                   <% else %>
@@ -88,8 +100,11 @@
               <h4 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">Round <%= round %></h4>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 <% brackets.sort_by(&:position).each do |bracket| %>
-                  <div class="border-2 <%= bracket.completed ? 'border-orange-300 bg-orange-50' : 'border-gray-300 bg-white' %> rounded-lg p-4">
-                    <div class="text-xs text-gray-500 mb-2">Match <%= bracket.position %></div>
+                  <div class="border-2 <%= bracket.completed ? 'border-orange-300 bg-orange-50' : bracket.match ? 'border-blue-300 bg-blue-50' : 'border-gray-300 bg-white' %> rounded-lg p-4">
+                    <div class="text-xs text-gray-500 mb-2 flex items-center justify-between">
+                      <span>Match <%= bracket.position %></span>
+                      <%= link_to "Edit", edit_bracket_path(bracket), class: "text-indigo-600 hover:text-indigo-900 text-xs font-medium" %>
+                    </div>
                     
                     <!-- Fighter 1 -->
                     <div class="flex items-center justify-between mb-2 p-2 rounded <%= bracket.completed && bracket.winner_id == bracket.fighter1_id ? 'bg-orange-200' : 'bg-gray-100' %>">
@@ -123,8 +138,15 @@
                       <% end %>
                     </div>
                     
-                    <% if bracket.fighter1 && bracket.fighter2 && !bracket.completed %>
-                      <%= link_to "Record Result", edit_bracket_path(bracket), class: "w-full inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700" %>
+                    <!-- Action Buttons -->
+                    <% if bracket.match %>
+                      <% if bracket.match.status == 'pending' %>
+                        <%= link_to "Score Match", setup_match_path(bracket.match), class: "w-full inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700" %>
+                      <% else %>
+                        <div class="text-center text-xs text-orange-600 font-semibold">Match Completed</div>
+                      <% end %>
+                    <% elsif bracket.ready_to_fight? %>
+                      <%= button_to "Create Match", generate_matches_brackets_path, method: :post, class: "w-full inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700" %>
                     <% elsif bracket.completed %>
                       <div class="text-center text-xs text-orange-600 font-semibold">Completed</div>
                     <% else %>
@@ -147,7 +169,10 @@
           
           <div class="max-w-2xl mx-auto">
             <div class="bg-white rounded-lg p-6 shadow-md">
-              <div class="text-xs text-gray-500 mb-4 text-center">Championship Match</div>
+              <div class="text-xs text-gray-500 mb-4 text-center flex items-center justify-center space-x-4">
+                <span>Championship Match</span>
+                <%= link_to "Edit", edit_bracket_path(@finals), class: "text-indigo-600 hover:text-indigo-900 text-xs font-medium" %>
+              </div>
               
               <!-- Fighter 1 -->
               <div class="flex items-center justify-between mb-3 p-4 rounded-lg <%= @finals.completed && @finals.winner_id == @finals.fighter1_id ? 'bg-yellow-200 border-2 border-yellow-400' : 'bg-gray-100' %>">
@@ -185,13 +210,17 @@
                 <% end %>
               </div>
               
-              <% if @finals.fighter1 && @finals.fighter2 && !@finals.completed %>
-                <%= link_to "Record Finals Result", edit_bracket_path(@finals), class: "w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-bold rounded-md text-white bg-yellow-600 hover:bg-yellow-700 shadow-lg" %>
-              <% elsif @finals.completed %>
-                <div class="text-center">
-                  <div class="text-xl font-bold text-yellow-800 mb-2">🎉 Tournament Complete! 🎉</div>
-                  <div class="text-lg text-gray-700">Champion: <span class="font-bold"><%= @finals.winner.name %></span></div>
-                </div>
+              <% if @finals.match %>
+                <% if @finals.match.status == 'pending' %>
+                  <%= link_to "Score Finals", setup_match_path(@finals.match), class: "w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-bold rounded-md text-white bg-yellow-600 hover:bg-yellow-700 shadow-lg" %>
+                <% elsif @finals.completed %>
+                  <div class="text-center">
+                    <div class="text-xl font-bold text-yellow-800 mb-2">🎉 Tournament Complete! 🎉</div>
+                    <div class="text-lg text-gray-700">Champion: <span class="font-bold"><%= @finals.winner.name %></span></div>
+                  </div>
+                <% end %>
+              <% elsif @finals.ready_to_fight? %>
+                <%= button_to "Create Finals Match", generate_matches_brackets_path, method: :post, class: "w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-bold rounded-md text-white bg-green-600 hover:bg-green-700 shadow-lg" %>
               <% else %>
                 <div class="text-center text-sm text-gray-400">Waiting for bracket winners</div>
               <% end %>
@@ -210,7 +239,7 @@
       <h3 class="mt-2 text-sm font-medium text-gray-900">No brackets created</h3>
       <p class="mt-1 text-sm text-gray-500">Complete all pools first, then generate elimination brackets.</p>
       <div class="mt-6">
-        <%= link_to "Generate Brackets", new_bracket_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700" %>
+        <%= link_to "Generate Brackets", new_bracket_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
       </div>
     </div>
   <% end %>

@@ -2,6 +2,8 @@ class Bracket < ApplicationRecord
   belongs_to :fighter1, class_name: 'Fighter', optional: true
   belongs_to :fighter2, class_name: 'Fighter', optional: true
   belongs_to :winner, class_name: 'Fighter', optional: true
+  belongs_to :loser, class_name: 'Fighter', optional: true
+  belongs_to :match, optional: true  # NEW: Add match association
 
   validates :round, presence: true
   validates :position, presence: true
@@ -13,7 +15,28 @@ class Bracket < ApplicationRecord
   scope :losers_bracket, -> { where(bracket_type: 'losers') }
   scope :finals, -> { where(bracket_type: 'finals') }
 
+  def ready_to_fight?
+    fighter1.present? && fighter2.present? && !completed
+  end
+
+  def create_match
+    return unless ready_to_fight?
+    return if match.present?
+
+    new_match = Match.create!(
+      fighter1: fighter1,
+      fighter2: fighter2,
+      status: 'pending',
+      fighter1_points: 0,
+      fighter2_points: 0
+    )
+
+    update(match: new_match)
+  end
+
   def complete_bracket(winner_id)
+    return unless match&.status == 'completed'
+
     loser_id = fighter1_id == winner_id ? fighter2_id : fighter1_id
     update(winner_id: winner_id, loser_id: loser_id, completed: true)
     advance_winner
@@ -36,7 +59,7 @@ class Bracket < ApplicationRecord
       next_position = (position / 2.0).ceil
 
       next_bracket = Bracket.find_or_create_by(
-        round: next_round, 
+        round: next_round,
         position: next_position,
         bracket_type: 'winners'
       )
@@ -48,12 +71,10 @@ class Bracket < ApplicationRecord
       end
     elsif bracket_type == 'losers'
       # Advance to next losers round or finals
-      # Implementation depends on bracket structure
     end
   end
 
   def advance_loser
     # Send loser to losers bracket
-    # This needs custom logic based on round structure
   end
 end

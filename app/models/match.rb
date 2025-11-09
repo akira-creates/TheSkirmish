@@ -1,5 +1,6 @@
 class Match < ApplicationRecord
   belongs_to :pool, optional: true
+  belongs_to :bracket, optional: true  # NEW
   belongs_to :fighter1, class_name: 'Fighter'
   belongs_to :fighter2, class_name: 'Fighter'
   belongs_to :winner, class_name: 'Fighter', optional: true
@@ -93,5 +94,15 @@ class Match < ApplicationRecord
 
   def fighter2_penalties
     penalties.where(fighter_id: fighter2_id).recent
+  end
+
+  after_update :update_bracket_completion, if: :saved_change_to_status?
+
+  private
+
+  def update_bracket_completion
+    if bracket.present? && status == 'completed' && winner_id.present?
+      bracket.complete_bracket(winner_id)
+    end
   end
 end
