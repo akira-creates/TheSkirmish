@@ -1,0 +1,83 @@
+<div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+  <div class="p-2 bg-gray-50 text-center text-xs font-medium text-gray-700">
+    Match <%= bracket.position %>
+  </div>
+
+  <!-- Fighter 1 -->
+  <div class="p-2 border-b border-gray-200 flex justify-between items-center <%= bracket.completed && bracket.winner == bracket.fighter1 ? 'bg-green-50 border-l-4 border-green-500' : bracket.completed ? 'bg-gray-50' : '' %>">
+    <% if bracket.fighter1 %>
+      <div class="flex-1 truncate">
+        <span class="text-sm <%= bracket.completed && bracket.winner == bracket.fighter1 ? 'font-extrabold text-green-800' : bracket.completed ? 'text-gray-500' : 'text-gray-900' %>">
+          <%= bracket.fighter1.name %>
+        </span>
+        <span class="text-xs <%= bracket.completed && bracket.winner == bracket.fighter1 ? 'text-green-700' : 'text-gray-500' %>">
+          (<%= bracket.fighter1.club %>)
+        </span>
+        <% if bracket.completed && bracket.match %>
+          <span class="text-xs ml-1 font-semibold <%= bracket.winner == bracket.fighter1 ? 'text-green-700' : 'text-gray-500' %>">
+            <%= bracket.match.fighter1_points %>
+          </span>
+        <% end %>
+      </div>
+      <% if bracket.completed && bracket.winner == bracket.fighter1 %>
+        <div class="flex items-center">
+          <span class="px-2 py-0.5 text-xs font-bold text-white bg-green-600 rounded">WIN</span>
+        </div>
+      <% end %>
+    <% else %>
+      <span class="text-sm italic text-gray-400">
+        <%= bracket.bracket_type == 'upper' ? 'TBD' : 'Waiting' %>
+      </span>
+    <% end %>
+  </div>
+
+  <!-- Fighter 2 -->
+  <div class="p-2 border-b border-gray-200 flex justify-between items-center <%= bracket.completed && bracket.winner == bracket.fighter2 ? 'bg-green-50 border-l-4 border-green-500' : bracket.completed ? 'bg-gray-50' : '' %>">
+    <% if bracket.fighter2 %>
+      <div class="flex-1 truncate">
+        <span class="text-sm <%= bracket.completed && bracket.winner == bracket.fighter2 ? 'font-extrabold text-green-800' : bracket.completed ? 'text-gray-500' : 'text-gray-900' %>">
+          <%= bracket.fighter2.name %>
+        </span>
+        <span class="text-xs <%= bracket.completed && bracket.winner == bracket.fighter2 ? 'text-green-700' : 'text-gray-500' %>">
+          (<%= bracket.fighter2.club %>)
+        </span>
+        <% if bracket.completed && bracket.match %>
+          <span class="text-xs ml-1 font-semibold <%= bracket.winner == bracket.fighter2 ? 'text-green-700' : 'text-gray-500' %>">
+            <%= bracket.match.fighter2_points %>
+          </span>
+        <% end %>
+      </div>
+      <% if bracket.completed && bracket.winner == bracket.fighter2 %>
+        <div class="flex items-center">
+          <span class="px-2 py-0.5 text-xs font-bold text-white bg-green-600 rounded">WIN</span>
+        </div>
+      <% end %>
+    <% else %>
+      <span class="text-sm italic text-gray-400">
+        <%= bracket.bracket_type == 'upper' ? 'TBD' : 'Waiting' %>
+      </span>
+    <% end %>
+  </div>
+
+  <!-- Actions -->
+  <div class="p-2 bg-gray-50 text-center">
+    <% if bracket.completed && bracket.match %>
+      <span class="text-xs font-semibold text-green-600">Completed</span>
+      <div class="text-xs mt-1">
+        <%= link_to "View Match ##{bracket.match.id}", display_match_path(bracket.match), class: "text-gray-600 hover:text-gray-900" %>
+      </div>
+    <% elsif bracket.ready_to_fight? && bracket.match %>
+      <div class="text-xs">
+        <%= link_to 'Setup & Score', setup_match_path(bracket.match), class: "text-red-600 hover:text-red-800 font-medium" %>
+      </div>
+      <div class="text-xs text-gray-500 mt-1">Match #<%= bracket.match.id %></div>
+    <% elsif bracket.ready_to_fight? %>
+      <span class="text-xs text-yellow-600">Ready - needs match</span>
+    <% else %>
+      <span class="text-xs text-gray-500">Pending</span>
+    <% end %>
+    <div class="mt-1">
+      <%= link_to 'Edit', edit_bracket_path(bracket), class: "text-xs text-gray-600 hover:text-gray-900" %>
+    </div>
+  </div>
+</div>

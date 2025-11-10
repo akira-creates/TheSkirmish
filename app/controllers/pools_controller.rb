@@ -1,5 +1,5 @@
 class PoolsController < ApplicationController
-  before_action :set_pool, only: [ :show, :edit, :update, :destroy, :generate_matches, :complete ]
+  before_action :set_pool, only: [ :show, :edit, :update, :destroy, :generate_matches, :clear_matches, :complete ]
 
   def index
     @pools = Pool.includes(:fighters).order(:name)
@@ -62,6 +62,11 @@ class PoolsController < ApplicationController
   def generate_matches
     @pool.generate_matches
     redirect_to @pool, notice: 'Matches generated successfully.'
+  end
+
+  def clear_matches
+    @pool.matches.destroy_all
+    redirect_to @pool, notice: 'All matches cleared successfully.'
   end
 
   def complete

@@ -29,31 +29,58 @@ weapons_data = [
   { name: 'Arming Sword', weapon_type: 'Main Hand', cost: 2 },
 
   # Off hand weapons
-  { name: 'Kite Shield', weapon_type: 'Off Hand', cost: 3 },
+  { name: 'Kite Shield', weapon_type: 'Off Hand', cost: 4 },
+  { name: 'Buckler', weapon_type: 'Off Hand', cost: 3 },
+  { name: 'Cloak', weapon_type: 'Off Hand', cost: 3 },
   { name: 'Dagger', weapon_type: 'Off Hand', cost: 2 },
-  { name: 'Buckler', weapon_type: 'Off Hand', cost: 2 },
-  { name: 'Cloak', weapon_type: 'Off Hand', cost: 2 },
+  { name: 'Kitchen pot/pan', weapon_type: 'Off Hand', cost: 2 },
   { name: 'Rubber Chicken', weapon_type: 'Off Hand', cost: 1 },
   { name: 'Cardboard box', weapon_type: 'Off Hand', cost: 1 },
-  { name: 'Kitchen pot/pan', weapon_type: 'Off Hand', cost: 1 },
   { name: 'Rope', weapon_type: 'Off Hand', cost: 1 }
 ]
 
-weapons_data.each do |weapon_data|
-  Weapon.create!(weapon_data)
+if Weapon.count > 0
+  puts "Weapons already exist, skipping weapon creation"
+else
+  weapons_data.each do |weapon_data|
+    Weapon.create!(weapon_data)
+  end
+  puts "#{Weapon.count} weapons created"
 end
-
-puts "#{Weapon.count} weapons created"
 
 # Create sample fighters
-clubs = [ 'Southern Cross Swords' ]
+clubs = [ 'Southern Cross Swords', 'Auckland Sword & Shield', 'Ironfolk Combat', 'Whangarei Medieval Combat Club', 'Canterbury Historical Fencing Club', 'Waikato Duellists Society' ]
 
-puts "How many fighters would you like to create? "
-gets.chomp.to_i.times do |i|
-  Fighter.create!(
-    name: Faker::Name.name,
-    club: clubs.sample
-  )
+response = nil
+while response != 'y' && response != 'n'
+  puts "Would you like to create randomized fighters? (y/n) "
+  response = gets.chomp.downcase
 end
 
+if response == 'y'
+  puts "How many fighters would you like to create? "
+  gets.chomp.to_i.times do |i|
+    Fighter.create!(
+      name: Faker::Name.name,
+      club: clubs.sample
+    )
+  end
+else
+  Fighter.create!(name: 'Jackson Bird', club: clubs[0])
+  Fighter.create!(name: 'Josh Gilligan', club: clubs[0])
+  Fighter.create!(name: 'Maxwell Arnott', club: clubs[0])
+  Fighter.create!(name: 'Marc Bailie', club: clubs[0])
+  # Fighter.create!(name: 'Tobias Goodwin', club: clubs[0])
+  # Fighter.create!(name: 'Will Smart', club: clubs[4])
+  # Fighter.create!(name: 'Josh Gummer', club: clubs[4])
+  # Fighter.create!(name: 'Joshua Lowe', club: clubs[4])
+  # Fighter.create!(name: 'Sam Spekreijse', club: clubs[4])
+  # Fighter.create!(name: 'Charlie O\'Malley', club: clubs[4])
+  # Fighter.create!(name: 'Evelyn Ann Lewis', club: clubs[4])
+  # Fighter.create!(name: 'Christian Whyte', club: clubs[1])
+  # Fighter.create!(name: 'Lincoln Rose', club: clubs[2])
+  # Fighter.create!(name: 'Atreyu Norman', club: clubs[2])
+  # Fighter.create!(name: 'Liam Shaw', club: clubs[3])
+  # Fighter.create!(name: 'Jonothon Grose', club: clubs[5])
+end
 puts "#{Fighter.count} fighters created"

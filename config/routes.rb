@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     resources :pools do
       member do
         post :generate_matches
+        post :clear_matches
         post :complete
       end
     end

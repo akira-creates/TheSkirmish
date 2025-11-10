@@ -24,6 +24,7 @@ class FightersController < ApplicationController
   end
 
   def edit
+    @all_fighters = Fighter.order(:name)
   end
 
   def update

@@ -43,6 +43,10 @@ class Fighter < ApplicationRecord
     penalties.red_cards.count * 3
   end
 
+  def name_with_club
+    "#{name} (#{club})"
+  end
+
   private
 
   def initialize_stats

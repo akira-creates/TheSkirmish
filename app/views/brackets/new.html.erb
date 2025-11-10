@@ -2,51 +2,55 @@
   <div class="md:grid md:grid-cols-3 md:gap-6">
     <div class="md:col-span-1">
       <div class="px-4 sm:px-0">
-        <h3 class="text-lg font-medium leading-6 text-gray-900">Generate Elimination Brackets</h3>
+        <h3 class="text-lg font-medium text-gray-900">Generate Brackets</h3>
         <p class="mt-1 text-sm text-gray-600">
-          Create double elimination brackets from the top performers in the pools.
+          Create double elimination brackets from top pool performers.
         </p>
         <div class="mt-4 p-4 bg-blue-50 rounded-md">
           <p class="text-sm text-blue-700">
-            <strong>Available fighters:</strong> <%= Fighter.where(eliminated: false).count %>
+            <strong>Eligible fighters:</strong> <%= Fighter.where(eliminated: false).count %>
           </p>
         </div>
       </div>
     </div>
     <div class="mt-5 md:mt-0 md:col-span-2">
-      <%= form_with url: brackets_path, method: :post, local: true, class: "bg-white shadow rounded-lg" do |f| %>
+      <%= form_with url: brackets_path, method: :post, class: "bg-white shadow rounded-lg" do |f| %>
         <div class="px-4 py-5 sm:p-6">
           <div class="grid grid-cols-6 gap-6">
             <div class="col-span-6">
-              <label for="num_qualifiers" class="block text-sm font-medium text-gray-700">Number of Qualifiers</label>
-              <%= number_field_tag :num_qualifiers, @num_qualifiers, min: 4, max: 32, step: 1, class: "mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" %>
-              <p class="mt-2 text-sm text-gray-500">Must be a power of 2 (4, 8, 16, 32). Top fighters by wins and points will qualify.</p>
+              <label for="num_qualifiers" class="block text-sm font-medium text-gray-700">Number of Participants</label>
+              <%= number_field_tag :num_qualifiers, @num_qualifiers, min: 4, max: 32, step: 1, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" %>
+              <p class="mt-2 text-sm text-gray-500">Must be a power of 2 (4, 8, 16, 32)</p>
             </div>
+          </div>
 
-            <div class="col-span-6">
-              <div class="bg-gray-50 p-4 rounded-md">
-                <h4 class="text-sm font-medium text-gray-900 mb-3">Top Qualifiers Preview</h4>
-                <div class="space-y-2">
-                  <% @top_fighters.each_with_index do |fighter, index| %>
-                    <div class="flex items-center justify-between text-sm">
-                      <div class="flex items-center">
-                        <span class="font-semibold text-gray-700 w-8"><%= index + 1 %>.</span>
-                        <span class="font-medium text-gray-900"><%= fighter.name %></span>
-                        <span class="text-gray-500 ml-2">(<%= fighter.club %>)</span>
-                      </div>
-                      <div class="text-gray-600">
-                        <%= fighter.wins %>-<%= fighter.losses %> • <%= fighter.points %> pts
-                      </div>
-                    </div>
-                  <% end %>
+          <div class="mt-8 border-t border-gray-200 pt-6">
+            <div class="flex justify-between items-center mb-4">
+              <h4 class="text-sm font-medium text-gray-900">Top Fighters Preview</h4>
+              <span class="text-sm text-gray-600">Top <%= @num_qualifiers %></span>
+            </div>
+            <div class="space-y-1">
+              <% @top_fighters.each_with_index do |fighter, index| %>
+                <div class="flex items-center justify-between text-sm p-2 rounded <%= index.even? ? 'bg-gray-50' : 'bg-white' %>">
+                  <div class="flex items-center">
+                    <span class="font-semibold text-gray-700 w-6"><%= index + 1 %>.</span>
+                    <span class="font-medium text-gray-900"><%= fighter.name %></span>
+                    <span class="text-gray-500 ml-2 text-xs">(<%= fighter.club %>)</span>
+                  </div>
+                  <div class="text-gray-600 text-xs">
+                    <%= fighter.wins %>-<%= fighter.losses %> • <%= fighter.points %> pts
+                  </div>
                 </div>
-              </div>
+              <% end %>
+              <% if @top_fighters.empty? %>
+                <p class="text-sm text-red-600 text-center py-4">No eligible fighters found</p>
+              <% end %>
             </div>
           </div>
         </div>
         <div class="px-4 py-3 bg-gray-50 text-right sm:px-6 rounded-b-lg">
           <%= link_to "Cancel", brackets_path, class: "inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 mr-3" %>
-          <%= f.submit "Generate Brackets", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700", data: { confirm: "This will create elimination brackets. Are you sure?" } %>
+          <%= f.submit "Generate Brackets", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700" %>
         </div>
       <% end %>
     </div>
