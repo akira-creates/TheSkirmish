@@ -17,7 +17,7 @@ class Match < ApplicationRecord
   DEBUFFS = {
     'None' => 0,
     'Nerf Gun' => 0,
-    'The Pig' => 5,
+    'The Pig' => 4,
     'Swap Hands' => 4,
     'Hands Tied' => 4,
     'The Balloon' => 4,

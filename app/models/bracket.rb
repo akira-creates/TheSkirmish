@@ -14,6 +14,7 @@ class Bracket < ApplicationRecord
   scope :upper_bracket, -> { where(bracket_type: 'upper') }
   scope :lower_bracket, -> { where(bracket_type: 'lower') }
   scope :finals, -> { where(bracket_type: 'finals') }
+  scope :completed, -> { where(completed: true) }
 
   def ready_to_fight?
     fighter1.present? && fighter2.present? && !completed
@@ -125,16 +126,21 @@ class Bracket < ApplicationRecord
     return unless loser_id
 
     # In double elimination, losers from upper bracket drop to lower bracket
-    # Round 1 upper bracket losers go to round 1 lower bracket
-    # Round N upper bracket losers go to round 2N-1 lower bracket
+    # Losers are paired up: two adjacent upper bracket positions feed into one lower bracket position
+    # UB R1 losers → LB R1
+    # UB R2 losers → LB R2 (feed into winners from LB R1)
+    # UB R3 losers → LB R4 (feed into winners from LB R3)
+    # Formula: UB RN losers → LB R(2N-2) for N > 1
 
-    if round == 1
-      target_round = 1
-      target_position = position
+    target_round = if round == 1
+      1
     else
-      target_round = (round * 2) - 1
-      target_position = position
+      (round * 2) - 2
     end
+
+    # Two upper bracket matches feed into one lower bracket match
+    # Positions 1 & 2 → LB position 1, positions 3 & 4 → LB position 2, etc.
+    target_position = ((position + 1) / 2.0).ceil
 
     next_bracket = Bracket.find_by(
       bracket_type: 'lower',

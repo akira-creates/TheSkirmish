@@ -16,50 +16,52 @@
   <% if @upper_brackets.any? || @lower_brackets.any? %>
     <!-- Upper Bracket -->
     <div class="mb-8">
-      <div class="bg-white shadow rounded-lg overflow-hidden">
+      <div class="bg-white shadow rounded-lg overflow-x-auto">
         <div class="px-6 py-4 bg-green-50 border-b border-green-200">
           <h3 class="text-lg font-medium text-green-900">Upper Bracket</h3>
-          <p class="text-sm text-green-700">Winners advance to next round</p>
+          <p class="text-sm text-green-700">Winners advance to next round → Losers drop to lower bracket</p>
         </div>
-        <div class="p-6 space-y-8">
-          <% @upper_brackets.group_by(&:round).sort.each do |round, brackets| %>
-            <div>
-              <h4 class="text-base font-semibold text-gray-900 mb-4">Round <%= round %></h4>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <% brackets.each do |bracket| %>
-                  <%= render 'brackets/bracket_match', bracket: bracket %>
-                <% end %>
-              </div>
-            </div>
-          <% end %>
+        <div class="p-6 bg-green-50">
+          <%= render 'brackets/bracket_tree', brackets: @upper_brackets %>
         </div>
       </div>
     </div>
 
     <!-- Lower Bracket -->
     <div class="mb-8">
-      <div class="bg-white shadow rounded-lg overflow-hidden">
+      <div class="bg-white shadow rounded-lg overflow-x-auto">
         <div class="px-6 py-4 bg-orange-50 border-b border-orange-200">
           <h3 class="text-lg font-medium text-orange-900">Lower Bracket</h3>
-          <p class="text-sm text-orange-700">Second chance for fighters who lost in upper bracket</p>
+          <p class="text-sm text-orange-700">Second chance → Winners advance, losers are eliminated</p>
         </div>
-        <div class="p-6 space-y-8">
-          <% @lower_brackets.group_by(&:round).sort.each do |round, brackets| %>
-            <div>
-              <h4 class="text-base font-semibold text-gray-900 mb-4">Round <%= round %></h4>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <% brackets.each do |bracket| %>
-                  <%= render 'brackets/bracket_match', bracket: bracket %>
-                <% end %>
-              </div>
-            </div>
-          <% end %>
+        <div class="p-6 bg-orange-50">
+          <%= render 'brackets/bracket_tree', brackets: @lower_brackets %>
         </div>
       </div>
     </div>
 
-    <!-- Grand Finals -->
+    <!-- Bracket Convergence Indicator -->
     <% if @finals %>
+      <div class="mb-8 flex items-center justify-center">
+        <div class="text-center">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <div class="h-1 w-16 bg-green-500"></div>
+              <span class="text-xs font-medium text-green-700">Upper</span>
+            </div>
+            <svg class="h-8 w-8 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd"/>
+            </svg>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-medium text-orange-700">Lower</span>
+              <div class="h-1 w-16 bg-orange-500"></div>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">Both brackets converge to finals</p>
+        </div>
+      </div>
+
+      <!-- Grand Finals -->
       <div class="mb-8">
         <div class="bg-white shadow rounded-lg overflow-hidden border-2 border-yellow-400">
           <div class="px-6 py-4 bg-yellow-50 border-b border-yellow-200">

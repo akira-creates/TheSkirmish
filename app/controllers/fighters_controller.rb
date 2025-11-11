@@ -47,6 +47,6 @@ class FightersController < ApplicationController
   end
 
   def fighter_params
-    params.require(:fighter).permit(:name, :club)
+    params.require(:fighter).permit(:name, :club, :eliminated)
   end
 end

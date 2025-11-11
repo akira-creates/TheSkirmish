@@ -119,14 +119,15 @@ class BracketGenerator
   end
 
   def calculate_lower_bracket_matches(round, bracket_size)
-    # Lower bracket structure:
-    # Round 1, 3, 5... (odd): Receive losers from upper bracket
-    # Round 2, 4, 6... (even): Winners advance within lower bracket
-    if round.odd?
-      bracket_size / (2 ** ((round + 1) / 2))
-    else
-      bracket_size / (2 ** (round / 2 + 1))
-    end
+    # Lower bracket structure for double elimination:
+    # Round 1: Losers from UB R1 pair up → bracket_size / 4 matches
+    # Round 2: Winners from LB R1 advance → bracket_size / 8 matches
+    # Round 3: Winners from LB R2 meet losers from UB R2 → bracket_size / 8 matches
+    # Round 4: Winners from LB R3 advance → bracket_size / 16 matches
+    # Pattern: Each pair of rounds halves the matches
+
+    round_pair = ((round - 1) / 2) + 1
+    bracket_size / (2 ** (round_pair + 1))
   end
 
   def create_finals_bracket

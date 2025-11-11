@@ -40,27 +40,35 @@ class Pool < ApplicationRecord
     scheduled_matches = []
 
     # Handle odd number of fighters by adding a bye
-    has_bye = fighters.size.odd?
-    fighters << nil if has_bye
+    if fighters.size.odd?
+      fighters << nil
+    end
 
     n = fighters.size
     rounds = n - 1
-    matches_per_round = n / 2
 
-    # Use circle method: fix first fighter, rotate others
+    # Use circle method: fix position 0, rotate others
     rounds.times do |round|
-      matches_per_round.times do |match|
-        home = (round - match) % (n - 1)
-        away = (n - 1 - match + round) % (n - 1)
+      (n / 2).times do |match|
+        # Pair positions from opposite sides
+        home = match
+        away = n - 1 - match
 
-        # Adjust indices for fixed first fighter
-        home = n - 1 if match == 0
+        # Apply rotation to all positions except the first (fixed)
+        if round > 0
+          if home > 0
+            home = 1 + ((home - 1 + round) % (n - 1))
+          end
+          if away > 0
+            away = 1 + ((away - 1 + round) % (n - 1))
+          end
+        end
 
         fighter1 = fighters[home]
         fighter2 = fighters[away]
 
-        # Skip bye rounds
-        next if fighter1.nil? || fighter2.nil?
+        # Skip bye matches and ensure no self-matches
+        next if fighter1.nil? || fighter2.nil? || fighter1 == fighter2
 
         scheduled_matches << [fighter1, fighter2]
       end

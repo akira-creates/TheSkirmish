@@ -1,0 +1,153 @@
+<div class="bracket-tree">
+  <% rounds = brackets.group_by(&:round).sort %>
+  <% rounds.each_with_index do |(round, round_brackets), round_index| %>
+    <div class="bracket-round" data-round="<%= round %>">
+      <div class="round-label">Round <%= round %></div>
+      <div class="matches-column">
+        <% round_brackets.each_with_index do |bracket, position| %>
+          <div class="bracket-match-wrapper <%= 'has-connection' if round_index < rounds.size - 1 %>"
+               data-bracket-id="<%= bracket.id %>"
+               data-position="<%= bracket.position %>">
+            <%= render 'brackets/bracket_match', bracket: bracket %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<style>
+.bracket-tree {
+  display: flex;
+  gap: 3rem;
+  overflow-x: auto;
+  padding: 1rem 0;
+  min-height: 400px;
+}
+
+.bracket-round {
+  display: flex;
+  flex-direction: column;
+  min-width: 250px;
+}
+
+.round-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #374151;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.matches-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  flex: 1;
+  gap: 2rem;
+}
+
+.bracket-match-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+/* Connecting lines for upper bracket (green) */
+.bg-green-50 .bracket-match-wrapper.has-connection::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  width: 1.5rem;
+  height: 2px;
+  background-color: #10b981;
+  z-index: 1;
+}
+
+.bg-green-50 .bracket-match-wrapper.has-connection::before {
+  content: '';
+  position: absolute;
+  left: calc(100% + 1.5rem);
+  height: 100%;
+  width: 2px;
+  background-color: #10b981;
+  z-index: 0;
+}
+
+.bg-green-50 .bracket-match-wrapper:nth-child(odd).has-connection::before {
+  top: 50%;
+  height: calc(100% + 2rem);
+}
+
+.bg-green-50 .bracket-match-wrapper:nth-child(even).has-connection::before {
+  bottom: 50%;
+  height: calc(100% + 2rem);
+}
+
+/* Connecting lines for lower bracket (orange) */
+.bg-orange-50 .bracket-match-wrapper.has-connection::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  width: 1.5rem;
+  height: 2px;
+  background-color: #f97316;
+  z-index: 1;
+}
+
+.bg-orange-50 .bracket-match-wrapper.has-connection::before {
+  content: '';
+  position: absolute;
+  left: calc(100% + 1.5rem);
+  height: 100%;
+  width: 2px;
+  background-color: #f97316;
+  z-index: 0;
+}
+
+.bg-orange-50 .bracket-match-wrapper:nth-child(odd).has-connection::before {
+  top: 50%;
+  height: calc(100% + 2rem);
+}
+
+.bg-orange-50 .bracket-match-wrapper:nth-child(even).has-connection::before {
+  bottom: 50%;
+  height: calc(100% + 2rem);
+}
+
+/* Finals connection (both brackets feed into finals) */
+.finals-connection {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3rem;
+}
+
+.finals-connection::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, #10b981 0%, #10b981 30%, #f59e0b 70%, #f59e0b 100%);
+}
+
+@media (max-width: 768px) {
+  .bracket-tree {
+    gap: 2rem;
+  }
+
+  .bracket-round {
+    min-width: 200px;
+  }
+
+  .matches-column {
+    gap: 1rem;
+  }
+}
+</style>

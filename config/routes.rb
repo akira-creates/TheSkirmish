@@ -4,6 +4,8 @@ Rails.application.routes.draw do
   authenticate :user do
     root 'dashboard#index', as: :authenticated_root
 
+    get 'tournament/summary', to: 'tournament#summary', as: :tournament_summary
+
     resources :fighters
     resources :weapons
 
